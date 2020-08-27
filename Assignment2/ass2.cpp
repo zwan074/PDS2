@@ -2,6 +2,7 @@
 #include "mpi.h"
 #include <vector>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 using namespace std;
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
 
     MPI::COMM_WORLD.Scatter(sendbuf_rand_nums, ndata, MPI_FLOAT, recvbuf_rand_nums, ndata, MPI_FLOAT, root);
 
-    vector<vector<float>> small_bucket;
+    vector<vector<float> > small_bucket;
 
     for (int i = 0; i < numproc; ++i) 
         small_bucket.push_back(new vector<float>);
