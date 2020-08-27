@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
         small_bucket[bktno].push_back(recvbuf_rand_nums[i]);
     }
 
-    for (int i = 0; i < small_bucket[i].size(); ++i) {
+    for (int i = 0; i < small_bucket.size(); ++i) {
         cout << " bucket No. " << i << endl;
-        for (int j = 0; j < ndata ; ++j){
+        for (int j = 0; j < small_bucket[i].size() ; ++j){
             cout << small_bucket[i][j] << "," ; 
         }
         cout << endl;
