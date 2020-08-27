@@ -54,7 +54,9 @@ int main(int argc, char *argv[])
         cout << "SEND " << myid << " : "  << endl;
         for (int i = 0; i < ndata * numproc; ++i) {
             sendbuf_rand_nums[i] = drand48()*(xmax-xmin-1)+xmin;
+            cout <<  sendbuf_rand_nums[i] << ",";
         }   
+        << endl;
     }
     
 
@@ -82,6 +84,6 @@ int main(int argc, char *argv[])
 
     MPI::Finalize();
 
-    delete[] sendbuf_rand_nums;
-    delete[] recvbuf_rand_nums;
+    //delete[] sendbuf_rand_nums;
+    //delete[] recvbuf_rand_nums;
 }
