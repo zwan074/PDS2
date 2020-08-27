@@ -33,7 +33,7 @@ int empty_small(std::vector<float>& small_bucket,
 
 int main(int argc, char *argv[])
 {
-    const int ndata = 5;
+    const int ndata = 50;
     const float xmin = 0.0;
     const float xmax = 100.0;
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     }
 
     for (int i = 0; i < small_bucket.size(); ++i) {
-        cout << "RECV " << myid << " : " << " bucket No. " << i << endl;
+        cout << "SMALL BUCKET RECV " << myid << " : " << " bucket No. " << i << endl;
         for (int j = 0; j < small_bucket[i].size() ; ++j){
             cout << small_bucket[i][j] << "," ; 
         }
