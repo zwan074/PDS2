@@ -68,14 +68,14 @@ int main(int argc, char *argv[])
         vector<float> sub_small_bucket;
         small_bucket.push_back(sub_small_bucket);
     }
-    cout << "RECV " << myid << " : " << endl;
+
     for (int i = 0; i < ndata; ++i) {
         int bktno = (int)floor((recvbuf_rand_nums[i] - xmin) / stepsize);
         small_bucket[bktno].push_back(recvbuf_rand_nums[i]);
     }
 
     for (int i = 0; i < small_bucket.size(); ++i) {
-        cout "RECV " << myid << " : " << " bucket No. " << i << endl;
+        cout << "RECV " << myid << " : " << " bucket No. " << i << endl;
         for (int j = 0; j < small_bucket[i].size() ; ++j){
             cout << small_bucket[i][j] << "," ; 
         }
