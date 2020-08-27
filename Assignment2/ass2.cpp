@@ -62,9 +62,10 @@ int main(int argc, char *argv[])
 
     vector<vector<float> > small_bucket;
 
-    for (int i = 0; i < numproc; ++i) 
-        small_bucket.push_back(new vector<float>);
-
+    for (int i = 0; i < numproc; ++i) {
+        vector<float> sub_small_bucket;
+        small_bucket.push_back(sub_small_bucket);
+    }
     cout << "RECV " << myid << " : " << endl;
     for (int i = 0; i < ndata; ++i) {
         int bktno = (int)floor((recvbuf_rand_nums[i] - xmin) / stepsize);
