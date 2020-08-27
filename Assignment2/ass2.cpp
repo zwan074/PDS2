@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
     int root = 0;
 
     if (myid == root) {
-    cout << "SEND " << myid << " : "  << endl;;
-    for (int i = 0; i < ndata * numproc; ++i) {
-        sendbuf_rand_nums[i] = drand48()*(xmax-xmin-1)+xmin;
-        //cout << sendbuf[i] << " ";
-    }   
+        cout << "SEND " << myid << " : "  << endl;
+        for (int i = 0; i < ndata * numproc; ++i) {
+            sendbuf_rand_nums[i] = drand48()*(xmax-xmin-1)+xmin;
+        }   
+    }
     
 
     MPI::COMM_WORLD.Scatter(sendbuf_rand_nums, ndata, MPI_FLOAT, recvbuf_rand_nums, ndata, MPI_FLOAT, root);
@@ -64,12 +64,11 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numproc; ++i) 
         small_bucket.push_back(new vector<float>);
 
-    cout << "RECV " << myid << " : ";
+    cout << "RECV " << myid << " : " << endl;
     for (int i = 0; i < ndata; ++i) {
         int bktno = (int)floor((recvbuf_rand_nums[i] - xmin) / stepsize);
         small_bucket[bktno].push_back(recvbuf_rand_nums[i]);
     }
-    cout << endl;
 
     for (int i = 0; i < ndata; ++i) {
         for (int j = 0; j < small_bucket[i].size(); ++j){
