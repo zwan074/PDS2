@@ -74,8 +74,9 @@ int main(int argc, char *argv[])
         small_bucket[bktno].push_back(recvbuf_rand_nums[i]);
     }
 
-    for (int i = 0; i < ndata; ++i) {
-        for (int j = 0; j < small_bucket[i].size(); ++j){
+    for (int i = 0; i < small_bucket[i].size(); ++i) {
+        cout << " bucket No. " << i << endl;
+        for (int j = 0; j < ndata ; ++j){
             cout << small_bucket[i][j] << "," ; 
         }
         cout << endl;
@@ -84,6 +85,6 @@ int main(int argc, char *argv[])
 
     MPI::Finalize();
 
-    //delete[] sendbuf_rand_nums;
-    //delete[] recvbuf_rand_nums;
+    delete[] sendbuf_rand_nums;
+    delete[] recvbuf_rand_nums;
 }
