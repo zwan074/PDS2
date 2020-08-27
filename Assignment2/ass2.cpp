@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
             sendbuf_rand_nums[i] = drand48()*(xmax-xmin-1)+xmin;
             cout <<  sendbuf_rand_nums[i] << ",";
         }   
-        << endl;
+        cout << endl;
     }
     
 
