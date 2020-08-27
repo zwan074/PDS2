@@ -2,6 +2,7 @@
 #include "mpi.h"
 #include <vector>
 #include <stdio.h>
+#include <math.h>
 
 using namespace std;
 
@@ -49,13 +50,12 @@ int main(int argc, char *argv[])
     int root = 0;
 
     if (myid == root) {
-    cout << "SEND " << myid << " : ";
+    cout << "SEND " << myid << " : "  << endl;;
     for (int i = 0; i < ndata * numproc; ++i) {
         sendbuf_rand_nums[i] = drand48()*(xmax-xmin-1)+xmin;
         //cout << sendbuf[i] << " ";
     }   
-    cout << endl;
-    }
+    
 
     MPI::COMM_WORLD.Scatter(sendbuf_rand_nums, ndata, MPI_FLOAT, recvbuf_rand_nums, ndata, MPI_FLOAT, root);
 
