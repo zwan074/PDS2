@@ -1,6 +1,7 @@
 #include <iostream>
 #include "mpi.h"
 #include <vector>
+#include <stdio.h>
 
 using namespace std;
 
@@ -80,6 +81,6 @@ int main(int argc, char *argv[])
 
     MPI::Finalize();
 
-    delete[] sendbuf;
-    delete[] recvbuf;
+    delete[] sendbuf_rand_nums;
+    delete[] recvbuf_rand_nums;
 }
