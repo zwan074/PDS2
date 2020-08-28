@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     const int ndata = 50;
-    const float xmin = 0.0;
+    const float xmin = -100.0;
     const float xmax = 100.0;
 
     MPI::Init(argc, argv);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     }
     cout << endl;
 
-    vector<float> big_bucket( ndata * 2);
+    vector<float> big_bucket( ndata * 1.5);
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
     cout << "SMALL BUCKET OFFSETS " << myid << endl;
