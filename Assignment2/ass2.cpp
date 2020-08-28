@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
     MPI::COMM_WORLD.Scatter(sendbuf_rand_nums, ndata, MPI_FLOAT, recvbuf_rand_nums, ndata, MPI_FLOAT, root);
 
     vector<vector<float> > small_bucket;
+    vector<int> nitems;
 
     for (int i = 0; i < numproc; ++i) {
         vector<float> sub_small_bucket;
@@ -75,13 +76,28 @@ int main(int argc, char *argv[])
     }
 
     for (int i = 0; i < small_bucket.size(); ++i) {
+        nitems.push_back(small_bucket[i].size());
         cout << "SMALL BUCKET RECV " << myid << " : " << " bucket No. " << i << endl;
+        cout << "SMALL BUCKET ITEMS " << myid << " : " << nitems[i] << endl;
         for (int j = 0; j < small_bucket[i].size() ; ++j){
             cout << small_bucket[i][j] << "," ; 
         }
         cout << endl;
     }
-    
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    vector<int> recvcnt(numproc);
+    MPI::COMM_WORLD.Alltoall(nitems, 1, MPI_INT, recvcnt, 1, MPI_INT);
+    vector<int> recvoff(numproc);
+    recvoff[0] = 0;
+    cout << "BIG BUCKET OFFSETS " << myid << " : " << nitems[i] << endl;
+    for (int n = 1; n < numproc; ++n) {
+        recvoff[n] = recvoff[n-1] + recvcnt[n-1];
+        cout << "BIG BUCKET OFFSETS " << recvoff[n] << ",";
+    }
+    cout << endl;
+
 
     MPI::Finalize();
 
