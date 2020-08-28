@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     }
     cout << endl;
 
-    vector<float> big_bucket;
+    vector<float> big_bucket( ndata * 2);
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
     cout << "SMALL BUCKET OFFSETS " << myid << endl;
@@ -99,10 +99,10 @@ int main(int argc, char *argv[])
         &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
 
     cout << "BIG BUCKET No. " << myid << endl;
-    /*
+    
     for (int i = 0; i < big_bucket.size() ; i++) {
         cout << big_bucket[i] << "," ;
-    }*/
+    }
     cout << endl;
     
     MPI::Finalize();
