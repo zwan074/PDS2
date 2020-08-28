@@ -148,10 +148,10 @@ int main(int argc, char *argv[])
 
     if (myid == root) {
         cout << " final vector : " << final_sorted_vector.size() << endl;
-        for (int i = 0; i < final_sorted_vector.size() ; i++) {
-            cout << final_sorted_vector[i] << "," ;
-        }
-        cout << endl;
+        //for (int i = 0; i < final_sorted_vector.size() ; i++) {
+            //cout << final_sorted_vector[i] << "," ;
+        //}
+        //cout << endl;
     }
     
 
