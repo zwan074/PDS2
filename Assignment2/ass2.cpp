@@ -7,6 +7,12 @@
 
 using namespace std;
 
+int compare (const void * a, const void * b)
+{
+  return ( *(int*)a - *(int*)b );
+}
+
+
 int main(int argc, char *argv[])
 {
     const int ndata = 50;
@@ -102,6 +108,8 @@ int main(int argc, char *argv[])
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
         &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
+    
+    qsort (big_bucket, big_bucket.size(), sizeof(float), compare);
 
     cout << "BIG BUCKET No. " << myid << endl;
     
@@ -109,7 +117,8 @@ int main(int argc, char *argv[])
         cout << big_bucket[i] << "," ;
     }
     cout << endl;
-    
+
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI::Finalize();
 
     delete[] sendbuf_rand_nums;
