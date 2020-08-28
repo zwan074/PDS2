@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     const int ndata = 50;
-    const float xmin = 0.0;
+    const float xmin = 1.0;
     const float xmax = 100.0;
 
     MPI::Init(argc, argv);
@@ -83,7 +83,12 @@ int main(int argc, char *argv[])
     }
     cout << endl;
 
-    vector<float> big_bucket( ndata * 1.5);
+    int big_bucket_size = 0 ;
+    for (int i = 0; i < recvcnt.size() ; i++) {
+        big_bucket_size += recvcnt[i];
+    }
+
+    vector<float> big_bucket( big_bucket_size );
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
     cout << "SMALL BUCKET OFFSETS " << myid << endl;
@@ -93,11 +98,6 @@ int main(int argc, char *argv[])
     }
     cout << endl;
     
-    for (int i = 0; i < big_bucket.size() ; i++ ) {
-        big_bucket.push_back(-1.0);
-    }
-
-
     MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
