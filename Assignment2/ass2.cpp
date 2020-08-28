@@ -86,9 +86,13 @@ int main(int argc, char *argv[])
     vector<float> big_bucket;
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
-    for (int n = 1; n < numproc; ++n) 
+    cout << "SMALL BUCKET OFFSETS " << myid << endl;
+    for (int n = 1; n < numproc; ++n) {
         sendoff[n] = sendoff[n-1] + nitems[n-1];
-
+        cout << "SMALL BUCKET OFFSETS " << sendoff[n] << ",";
+    }
+    cout << endl;
+    /*
     MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
@@ -99,7 +103,7 @@ int main(int argc, char *argv[])
         cout << big_bucket[i] << "," ;
     }
     cout << endl;
-
+    */
     MPI::Finalize();
 
     delete[] sendbuf_rand_nums;
