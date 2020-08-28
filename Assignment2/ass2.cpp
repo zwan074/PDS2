@@ -93,6 +93,11 @@ int main(int argc, char *argv[])
     }
     cout << endl;
     
+    for (int i = 0; i < big_bucket.size() ; i++ ) {
+        big_bucket.push_back(NULL);
+    }
+
+
     MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
