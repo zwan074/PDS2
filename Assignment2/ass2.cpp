@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     const int ndata = 50;
-    const float xmin = -100.0;
+    const float xmin = 0.0;
     const float xmax = 100.0;
 
     MPI::Init(argc, argv);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     cout << endl;
     
     for (int i = 0; i < big_bucket.size() ; i++ ) {
-        big_bucket.push_back(NULL);
+        big_bucket.push_back(-1.0);
     }
 
 
