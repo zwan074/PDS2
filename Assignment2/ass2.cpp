@@ -135,11 +135,14 @@ int main(int argc, char *argv[])
 
     MPI::COMM_WORLD.Gatherv( &big_bucket[0], big_bucket.size(), MPI_FLOAT, 
                             &final_sorted_vector[0], &recvcnt_final[0], &recvcnt_final_off[0] , MPI_FLOAT, 0);
-
-    for (int i = 0; i < final_sorted_vector.size() ; i++) {
-        cout << final_sorted_vector[i] << "," ;
+    if (myid == 0) {
+        cout << " final vector : " << endl;
+        for (int i = 0; i < final_sorted_vector.size() ; i++) {
+            cout << final_sorted_vector[i] << "," ;
+        }
+        cout << endl;
     }
-    cout << endl;
+    
 
     MPI::Finalize();
 
