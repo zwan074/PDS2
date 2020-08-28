@@ -62,25 +62,27 @@ int main(int argc, char *argv[])
 
     MPI::COMM_WORLD.Scatter(sendbuf_rand_nums, ndata, MPI_FLOAT, recvbuf_rand_nums, ndata, MPI_FLOAT, root);
 
-    vector<vector<float> > small_bucket;
+    vector<vector<float> > small_bucket_2d;
+    vector<float>  small_bucket_1d;
     vector<int> nitems;
 
     for (int i = 0; i < numproc; ++i) {
         vector<float> sub_small_bucket;
-        small_bucket.push_back(sub_small_bucket);
+        small_bucket_2d.push_back(sub_small_bucket);
     }
 
     for (int i = 0; i < ndata; ++i) {
         int bktno = (int)floor((recvbuf_rand_nums[i] - xmin) / stepsize);
-        small_bucket[bktno].push_back(recvbuf_rand_nums[i]);
+        small_bucket_2d[bktno].push_back(recvbuf_rand_nums[i]);
     }
 
-    for (int i = 0; i < small_bucket.size(); ++i) {
-        nitems.push_back(small_bucket[i].size());
+    for (int i = 0; i < small_bucket_2d.size(); ++i) {
+        nitems.push_back(small_bucket_2d[i].size());
         cout << "SMALL BUCKET RECV " << myid << " : " << " bucket No. " << i << endl;
         cout << "SMALL BUCKET ITEMS " << myid << " : " << nitems[i] << endl;
-        for (int j = 0; j < small_bucket[i].size() ; ++j){
-            cout << small_bucket[i][j] << "," ; 
+        for (int j = 0; j < small_bucket_2d[i].size() ; ++j){
+            cout << small_bucket_2d[i][j] << "," ; 
+            small_bucket_1d.push_back(small_bucket_2d[i][j]);
         }
         cout << endl;
     }
@@ -98,6 +100,23 @@ int main(int argc, char *argv[])
     }
     cout << endl;
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    vector<float> big_bucket;
+    vector<int> sendoff(numproc);
+    sendoff[0] = 0;
+    for (int n = 0; n < numproc; ++n) 
+        sendoff[n] = sendoff[n-1] + nitems[n-1];
+
+    MPI::COMM_WORLD.Alltoallv(
+        &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
+        &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
+
+    cout << "BIG BUCKET No. " << myid << endl;
+    for (int i = 0; i < big_bucket.size() ; i++) {
+        cout << big_bucket[i] << "," ;
+    }
+    cout << endl;
 
     MPI::Finalize();
 
