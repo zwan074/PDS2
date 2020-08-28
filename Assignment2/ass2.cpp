@@ -7,30 +7,6 @@
 
 using namespace std;
 
-/*
-int empty_small(std::vector<float>& small_bucket,
-    std::vector<int>& numpb,
-    std::vector<float>& big_bucket, int num_data_pp)
-    {
-    int num_buckets = numpb.size();
-    std::vector<int> recvcnt(num_buckets);
-    MPI::COMM_WORLD.Alltoall(&numpb[0], 1, MPI_INT, &recvcnt[0], 1, MPI_INT);
-    std::vector<int> recvoff(num_buckets);
-    recvoff[0] = 0;
-    int num_recv = recvcnt[0];
-    for (int n = 1; n < num_buckets; ++n) {
-        recvoff[n] = recvoff[n-1] + recvcnt[n-1];
-        num_recv += recvcnt[n];
-    }
-    std::vector<int> sendoff(num_buckets);
-    for (int n = 0; n < num_buckets; ++n) sendoff[n] = n * num_data_pp;
-    MPI::COMM_WORLD.Alltoallv(
-    &small_bucket[0], &numpb[0], &sendoff[0], MPI_FLOAT,
-    &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
-    return num_recv;
-}*/
-
-
 int main(int argc, char *argv[])
 {
     const int ndata = 50;
@@ -107,14 +83,13 @@ int main(int argc, char *argv[])
     }
     cout << endl;
 
-    MPI_Barrier(MPI_COMM_WORLD);
-
     vector<float> big_bucket;
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
     for (int n = 1; n < numproc; ++n) 
         sendoff[n] = sendoff[n-1] + nitems[n-1];
 
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
         &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
