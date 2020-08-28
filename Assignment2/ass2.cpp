@@ -119,8 +119,27 @@ int main(int argc, char *argv[])
     cout << endl;
 
     MPI_Barrier(MPI_COMM_WORLD);
+
+    vector<float> final_sorted_vector( ndata * numproc );
+    vector<float> recvcnt_final(numproc);
+
+
+    MPI::COMM_WORLD.Gather( big_bucket.size(), 1, MPI_INT, &recvcnt_final[0], 1, MPI_INT, 0);
+
+    vector<int> recvcnt_final_off(numproc);
+    recvcnt_final_off[0] = 0;
+    for (int n = 1; n < numproc; ++n) {
+        recvcnt_final_off[n] = recvcnt_final_off[n-1] + recvcnt_final[n-1];
+    }
+
+    MPI::COMM_WORLD.Gatherv( &big_bucket[0], big_bucket.size(), MPI_FLOAT, 
+                            &final_sorted_vector[0], &recvcnt_final[0], &recvcnt_final_off[0] , MPI_FLOAT, 0);
+
+    for (int i = 0; i < final_sorted_vector.size() ; i++) {
+        cout << final_sorted_vector[i] << "," ;
+    }
+    cout << endl;
+
     MPI::Finalize();
 
-    delete[] sendbuf_rand_nums;
-    delete[] recvbuf_rand_nums;
 }
