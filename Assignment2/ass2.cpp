@@ -92,11 +92,6 @@ int main(int argc, char *argv[])
         cout << "SMALL BUCKET OFFSETS " << sendoff[n] << ",";
     }
     cout << endl;
-    
-    for (int i = 0; i < big_bucket.size() ; i++ ) {
-        big_bucket.push_back(-1.0);
-    }
-
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
