@@ -81,11 +81,18 @@ int main(int argc, char *argv[])
         cout << "SMALL BUCKET RECV " << myid << " : " << " bucket No. " << i << endl;
         cout << "SMALL BUCKET ITEMS " << myid << " : " << nitems[i] << endl;
         for (int j = 0; j < small_bucket_2d[i].size() ; ++j){
-            cout << small_bucket_2d[i][j] << "," ; 
+            //cout << small_bucket_2d[i][j] << "," ; 
             small_bucket_1d.push_back(small_bucket_2d[i][j]);
         }
         cout << endl;
     }
+    cout << "SMALL BUCKET 1D " << myid << " : " << endl;
+    for (int i = 0; i < small_bucket_1d.size() ; ++i){
+        cout << small_bucket_1d[i] << "," ; 
+    }
+    cout << endl;
+
+
 
     MPI_Barrier(MPI_COMM_WORLD);
 
