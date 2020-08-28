@@ -88,10 +88,10 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
 
     vector<int> recvcnt(numproc);
-    MPI::COMM_WORLD.Alltoall(nitems, 1, MPI_INT, recvcnt, 1, MPI_INT);
+    MPI::COMM_WORLD.Alltoall(&nitems[0], 1, MPI_INT, &recvcnt[0], 1, MPI_INT);
     vector<int> recvoff(numproc);
     recvoff[0] = 0;
-    cout << "BIG BUCKET OFFSETS " << myid << " : " << nitems[i] << endl;
+    cout << "BIG BUCKET OFFSETS " << myid << endl;
     for (int n = 1; n < numproc; ++n) {
         recvoff[n] = recvoff[n-1] + recvcnt[n-1];
         cout << "BIG BUCKET OFFSETS " << recvoff[n] << ",";
