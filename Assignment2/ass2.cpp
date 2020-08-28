@@ -121,10 +121,11 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
 
     vector<float> final_sorted_vector( ndata * numproc );
-    vector<float> recvcnt_final(numproc);
+    vector<int> sendcnt_final(1);
+    vector<int> recvcnt_final(numproc);
+    sendcnt_final[0] = big_bucket.size();
 
-
-    MPI::COMM_WORLD.Gather( big_bucket.size(), 1, MPI_INT, &recvcnt_final[0], 1, MPI_INT, 0);
+    MPI::COMM_WORLD.Gather( &sendcnt_final[0], 1, MPI_INT, &recvcnt_final[0], 1, MPI_INT, 0);
 
     vector<int> recvcnt_final_off(numproc);
     recvcnt_final_off[0] = 0;
