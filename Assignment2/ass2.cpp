@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
         &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
     
-    qsort (big_bucket, big_bucket.size(), sizeof(float), compare);
+    qsort (&big_bucket[0], big_bucket.size(), sizeof(float), compare);
 
     cout << "BIG BUCKET No. " << myid << endl;
     
