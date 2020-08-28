@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     vector<float> big_bucket;
     vector<int> sendoff(numproc);
     sendoff[0] = 0;
-    for (int n = 0; n < numproc; ++n) 
+    for (int n = 1; n < numproc; ++n) 
         sendoff[n] = sendoff[n-1] + nitems[n-1];
 
     MPI::COMM_WORLD.Alltoallv(
