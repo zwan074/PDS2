@@ -92,18 +92,19 @@ int main(int argc, char *argv[])
         cout << "SMALL BUCKET OFFSETS " << sendoff[n] << ",";
     }
     cout << endl;
-    /*
+    
     MPI_Barrier(MPI_COMM_WORLD);
     MPI::COMM_WORLD.Alltoallv(
         &small_bucket_1d[0], &nitems[0], &sendoff[0], MPI_FLOAT,
         &big_bucket[0], &recvcnt[0], &recvoff[0], MPI_FLOAT);
 
     cout << "BIG BUCKET No. " << myid << endl;
+    /*
     for (int i = 0; i < big_bucket.size() ; i++) {
         cout << big_bucket[i] << "," ;
-    }
+    }*/
     cout << endl;
-    */
+    
     MPI::Finalize();
 
     delete[] sendbuf_rand_nums;
