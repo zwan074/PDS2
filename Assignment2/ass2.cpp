@@ -15,7 +15,7 @@ int compare (const void * a, const void * b)
 
 int main(int argc, char *argv[])
 {
-    const int ndata = 50;
+    const int ndata = 5000;
     const float xmin = 1.0;
     const float xmax = 100.0;
     double T0,T1,T2,T3;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 
     T1 = MPI_Wtime() - T1;
     cout << "T1 " << myid << " : " << T1 << endl;
-    
+
     if (myid == root) {
         cout << " final vector : " << final_sorted_vector.size() << endl;
         for (int i = 0; i < final_sorted_vector.size() ; i++) {
