@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 
   clock_t tend = clock();
   double tms = diffclock(tend, tstart);
-  std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+  //std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
 
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
