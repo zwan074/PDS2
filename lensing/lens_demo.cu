@@ -20,7 +20,7 @@ typedef struct {
   int width; 
   int height; 
   float* elements; 
-} 2d_Array;
+}; 2d_Array;
 
 // Global variables! Not nice style, but we'll get away with it here.
 
