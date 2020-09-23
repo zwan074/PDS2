@@ -13,8 +13,8 @@ CFLAGS = -w -O3
 OBJS = fitsfile.o lenses.o
 
 # Link to CFITSIO libraries - modify these accordingly
-LIBP = -L/home/zwan074/Desktop/PDS3/cfitsio
-INCP = -I/home/zwan074/Desktop/PDS3/cfitsio/lib
+LIBP = -L/home/s17272381/cfitsio
+INCP = -I/home/s17272381/cfitsio
 
 LIBS = -lcfitsio -lm
 
