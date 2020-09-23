@@ -34,7 +34,7 @@ lens_demo : lens_demo.cpp $(OBJS)
 
 # Modules compiled and linked separately
 fitsfile.o : fitsfile.cpp fitsfile.h
-	${CPP} $(CFLAGS) $(INCP) -c fitsfile.cpp
+	${NVCC} $(CFLAGS) $(INCP) -c fitsfile.cpp
 
 lenses.o : lenses.cpp lenses.h
 	${CPP} $(CFLAGS) $(INCP) -c lenses.cpp
