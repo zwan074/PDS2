@@ -16,7 +16,11 @@
 
 #include <cuda.h>
 
-
+typedef struct { 
+  int width; 
+  int height; 
+  float* elements; 
+} 2d_Array;
 
 // Global variables! Not nice style, but we'll get away with it here.
 
@@ -48,7 +52,7 @@ double diffclock(clock_t clock1,clock_t clock2)
   return diffms; // Time difference in milliseconds
 }
 
-__global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int nlenses , Array<float, 2>* lensim)
+__global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int nlenses , 2d_Array lensim)
 {
   int iy = blockDim.x * blockIdx.x + threadIdx.x;
   int ix = blockDim.y * blockIdx.y + threadIdx.y;
@@ -65,7 +69,7 @@ __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int nlenses ,
   sep2 = xd * xd + yd * yd;
   if (sep2 < rsrc2) {
     mu = sqrt(1 - sep2 / rsrc2);
-    lensim(iy, ix) = 1.0 - ldc * (1 - mu);
+    lensim[iy * lensim.width + ix ] = 1.0 - ldc * (1 - mu);
   }
 
 }
@@ -87,25 +91,28 @@ int main(int argc, char* argv[])
   std::cout << "# Building " << npixx << "X" << npixy << " lens image" << std::endl;
 
   // Put the lens image in this array
-  Array<float, 2> lensim(npixy, npixx);
+  2d_Array lensim_array;
+  2d_Array d_lensim_array;
+  d_lensim_array.width = npixy ;
+  d_lensim_array.height = npixx ;
+  lensim_array.width = npixy ;
+  lensim_array.height = npixx ;
+  size_t size = d_lensim_array.width * d_lensim_array.height * sizeof(float); 
+  cudaMalloc(&lensim_array.elements, size); 
 
-  size_t size = sizeof(lensim);
+ 
+  int blockWidth = 16;
+  int gridWidth =lensim_array.width /blockWidth;
 
-  Array<float, 2> *d_lensim;
-  cudaMalloc(&d_lensim, size);
-
-  int gridWidth = 5;
-  int blockWidth = npixy/gridWidth;
-  
   dim3 dimBlock(blockWidth, blockWidth);
   dim3 dimGrid(gridWidth, gridWidth);
-  lenssim_gpu<<<dimGrid, dimBlock>>>(xlens, ylens, eps, nlenses, d_lensim);
+  lenssim_gpu<<<dimGrid, dimBlock>>>(xlens, ylens, eps, nlenses, lensim_array);
 
   // Copy result from device memory into host memory
-  cudaMemcpy(lensim, d_lensim, size, cudaMemcpyDeviceToHost);
+  cudaMemcpy(lensim_array.elements, d_lensim_array.elements, size, cudaMemcpyDeviceToHost);
 
   // Free device memory
-  cudaFree(d_lensim);
+  cudaFree(lensim_array);
 
   clock_t tstart = clock();
 
@@ -139,6 +146,7 @@ int main(int argc, char* argv[])
       lensim(iy, ix) = 1.0 - ldc * (1 - mu);
     }
   }*/
+  Array<float, 2> lensim(npixy, npixx);
 
   clock_t tend = clock();
   double tms = diffclock(tend, tstart);
