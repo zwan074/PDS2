@@ -43,7 +43,20 @@ __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx_npi
 
   yl = YL1 + iy * lens_scale;
   xl = XL1 + ix * lens_scale;
-  shoot(xs, ys, xl, yl, xlens, ylens, eps, nlenses);
+  //shoot(xs, ys, xl, yl, xlens, ylens, eps, nlenses);
+
+  float dx, dy, dr;
+  xs = xl;
+  ys = yl;
+  for (int p = 0; p < nlenses; ++p) {
+    dx = xl - xlens[p];
+    dy = yl - ylens[p];
+    dr = dx * dx + dy * dy;
+    xs -= eps[p] * dx / dr;
+    ys -= eps[p] * dy / dr;
+  }
+
+
   xd = xs - xsrc;
   yd = ys - ysrc;
   sep2 = xd * xd + yd * yd;
@@ -76,17 +89,25 @@ int main(int argc, char* argv[])
   Array<float, 2> lensim(npixy, npixx);
 
 
-  size_t size = npixx_npixy * sizeof(float);
-  float *d_lensim;
-  
-  cudaMalloc(&d_lensim, size);
+  size_t size1 = npixx_npixy * sizeof(float);
+  size_t size2 = nlenses * sizeof(float);
+  float *d_lensim,*d_xlens,*d_ylens,*d_eps;
+
+  cudaMalloc(&d_lensim, size1);
+  cudaMalloc(&d_xlens, size2);
+  cudaMalloc(&d_ylens, size2);
+  cudaMalloc(&d_eps, size2);
+
   int threadsPerBlock = 1024;
   int blocksPerGrid = (npixx_npixy + threadsPerBlock - 1) / threadsPerBlock;
 
-  lensim_gpu<<<blocksPerGrid, threadsPerBlock>>>( xlens,  ylens,  eps,  npixx_npixy , nlenses , d_lensim);
-  cudaMemcpy( &lensim(0, 0), d_lensim, size, cudaMemcpyDeviceToHost);
+  lensim_gpu<<<blocksPerGrid, threadsPerBlock>>>( d_xlens,  d_ylens,  d_eps,  npixx_npixy , nlenses , d_lensim);
+  cudaMemcpy( &lensim(0, 0), d_lensim, size1, cudaMemcpyDeviceToHost);
 
   cudaFree(d_lensim);
+  cudaFree(d_xlens);
+  cudaFree(d_ylens);
+  cudaFree(d_eps);
 
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
