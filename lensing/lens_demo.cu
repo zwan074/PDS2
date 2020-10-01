@@ -24,7 +24,7 @@ const float XL2 =  WL;
 const float YL1 = -WL;
 const float YL2 =  WL;
 
-__global__ void lensim_gpu(float xlens, float ylens, float eps, int npixx_npixy ,int nlenses , float* lensim)
+__global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx_npixy ,int nlenses , float* lensim)
 {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -38,8 +38,8 @@ __global__ void lensim_gpu(float xlens, float ylens, float eps, int npixx_npixy 
   float xl, yl, xs, ys, sep2, mu;
   float xd, yd;
 
-  iy = npixx_npixy / i; 
-  ix = npixx_npixy % i;
+  int iy = npixx_npixy / i; 
+  int ix = npixx_npixy % i;
 
   yl = YL1 + iy * lens_scale;
   xl = XL1 + ix * lens_scale;
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   float* eps;
   const int nlenses = set_example_1(&xlens, &ylens, &eps);
   std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
-
+  const float lens_scale = 0.005;
 
   // Size of the lens image
   const int npixx = static_cast<int>(floor((XL2 - XL1) / lens_scale)) + 1;
@@ -77,7 +77,8 @@ int main(int argc, char* argv[])
 
 
   size_t size = npixx_npixy * sizeof(float);
-
+  float *d_lensim;
+  
   cudaMalloc(&d_lensim, size);
   int threadsPerBlock = 1024;
   int blocksPerGrid = (npixx_npixy + threadsPerBlock - 1) / threadsPerBlock;
