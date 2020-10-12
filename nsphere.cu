@@ -33,7 +33,7 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long radius, long ndim , long* count )
+__global__ void count_in_v1_gpu (long radius, long ndim , float* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -55,13 +55,12 @@ __global__ void count_in_v1_gpu (long radius, long ndim , long* count )
   }
 
   double rtestsq = 0;
-  long inc = 1.0;
 
   for (long k = 0; k < ndim; ++k) {
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count,inc);
+  if (rtestsq < rsquare) atomicAdd(count,1.0);
 
 }
 
@@ -195,8 +194,8 @@ int main(int argc, char* argv[])
     const long base = 2 * halfb + 1;
     const long ntotal = powlong(base, nd);
 
-    long h_count;
-    long *d_count;
+    float h_count;
+    float *d_count;
 
     cudaMalloc(&d_count, sizeof(long));
     int threadsPerBlock = 256;
