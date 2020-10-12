@@ -60,7 +60,7 @@ __global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* cou
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count,1.0);
+  if (rtestsq < rsquare) atomicAdd(&count,1.0);
 
 }
 
