@@ -16,10 +16,10 @@ To run (for example to make a 100X100 pixel image):
 
 #define NUM_THREADS 1
 
-int heat_seq(int argc, char* argv[]) 
+int heat_seq(int argc) 
 {
   const float tol = 0.00001;
-  const int npix = atoi(argv[1]);
+  const int npix = argc;
   const int npixx = npix;
   const int npixy = npix;
   const int ntotal = npixx * npixy;
@@ -74,6 +74,7 @@ int sum_vector(std::vector<int> vector) {
 
 int main(int argc, char* argv[]) 
 {
+  heat_seq(atoi(argv[1])) ;
   // X and Y dimensions. Force it to be a square.
   const int npix = atoi(argv[1]);
   const int npixx = npix;
