@@ -204,10 +204,11 @@ int main(int argc, char* argv[])
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( halfb, r,nd,d_count );
     cudaMemcpy( &h_count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
 
-
+    
     //const long num1 = count_in_v1(nd, r);
     //const long num2 = count_in_v2(nd, r);
     std::cout << " -> " << h_count << std::endl;
+    cudaFree(d_count);
   }
 
 
