@@ -147,9 +147,9 @@ int main(int argc, char* argv[])
     #pragma omp barrier
     
 
-    #pragma omp single {
+    #pragma omp single 
       fix_boundaries2(g); // doing once ?
-    }
+    
       
     nconverged[id] = 0;
 
@@ -165,9 +165,9 @@ int main(int argc, char* argv[])
     
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
     #pragma omp barrier
-    #pragma omp single {
+    #pragma omp single 
       ++iter;
-    }
+    
   } while (sum_vector(nconverged) < nrequired && iter < ITMAX);
 
 }
