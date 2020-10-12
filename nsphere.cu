@@ -33,13 +33,13 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long halfb, long radius, int ndim , float* count )
+__global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
   const long base = 2 * halfb + 1;
   const double rsquare = radius * radius;
-
+  const long ndim = ndim;
   // Indices in x,y,z,.... 
 
   long index[ndim];
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
 
     // Get a random value for the number of dimensions between 1 and
     // MAXDIM inclusive
-    const int  nd = lrand48() % (MAXDIM - 1) + 1;
+    const long  nd = lrand48() % (MAXDIM - 1) + 1;
     std::cout << "### " << n << " " << r << " " << nd << " ... " << std::endl;
 
     const long halfb = static_cast<long>(floor(r));
