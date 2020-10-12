@@ -39,10 +39,10 @@ __global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* cou
 
   const long base = 2 * halfb + 1;
   const double rsquare = radius * radius;
-  const long ndim = ndim;
+  const long ndim2 = ndim;
   // Indices in x,y,z,.... 
 
-  long index[ndim];
+  long index[ndim2];
 
   for (long i = 0; i < ndim; ++i) index[i] = 0;
   
