@@ -55,12 +55,13 @@ __global__ void count_in_v1_gpu (long radius, long ndim , long* count )
   }
 
   double rtestsq = 0;
+  long inc = 1.0;
 
   for (long k = 0; k < ndim; ++k) {
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count,1.0);
+  if (rtestsq < rsquare) atomicAdd(count,inc);
 
 }
 
