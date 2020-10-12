@@ -42,12 +42,9 @@ __global__ void count_in_v1_gpu (long radius, long ndim , long* count )
   const long base = 2 * halfb + 1;
   const double rsquare = radius * radius;
 
-  long count = 0;
-
   // Indices in x,y,z,.... 
   std::vector<long> index(ndim, 0);
 
-  const long ndim = index.size();
   for (long i = 0; i < ndim; ++i) index[i] = 0;
   long idx = 0;
   while (n != 0) {
@@ -197,8 +194,8 @@ int main(int argc, char* argv[])
     const long base = 2 * halfb + 1;
     const long ntotal = powlong(base, ndim);
 
-    float h_count;
-    float *d_count;
+    long h_count;
+    long *d_count;
 
     cudaMalloc(&d_count, sizeof(long));
     int threadsPerBlock = 256;
