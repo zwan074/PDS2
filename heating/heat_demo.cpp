@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
   // Draw the printed circuit components
   fix_boundaries2<float>(h);
   
-  omp_set_num_threads(NUM_THREADS);
+  omp_set_num_threads(atoi(argv[2]));
   double T0, T1;
   T0 = omp_get_wtime();
 
