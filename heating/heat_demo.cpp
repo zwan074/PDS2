@@ -14,7 +14,7 @@ To run (for example to make a 100X100 pixel image):
 #include "arrayff.hxx"
 #include "draw.hxx"
 
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 
 int heat_seq(int argc) 
 {
@@ -96,7 +96,8 @@ int main(int argc, char* argv[])
   // Draw the printed circuit components
   fix_boundaries2<float>(h);
   
-  omp_set_num_threads(atoi(argv[2]));
+  omp_set_num_threads(NUM_THREADS);
+
   double T0, T1;
   T0 = omp_get_wtime();
 
