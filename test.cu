@@ -29,7 +29,7 @@ int main() {
   cudaMalloc((void**)&cuda_count, sizeof(unsigned long long int));
   cudaMemcpy(cuda_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
   cout << "count: " << count << '\n';
-  inc <<< 100, 25 >>> (cuda_count);
+  inc <<< 100, 32 >>> (cuda_count);
   cudaMemcpy(&count, cuda_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
   cudaFree(cuda_count);
   cout << "count: " << count << '\n';
