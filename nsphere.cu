@@ -33,19 +33,19 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long radius, long ndim , float* count )
+__global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
-
-  const long halfb = static_cast<long>(floor(radius));
   const long base = 2 * halfb + 1;
   const double rsquare = radius * radius;
 
   // Indices in x,y,z,.... 
-  std::vector<long> index(ndim, 0);
+
+  long index[ndim];
 
   for (long i = 0; i < ndim; ++i) index[i] = 0;
+  
   long idx = 0;
   while (n != 0) {
     long rem = n % base;
@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
-    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( r,nd,d_count );
+    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( halfb, r,nd,d_count );
     cudaMemcpy( &h_count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
 
 
