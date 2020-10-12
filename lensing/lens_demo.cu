@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
   cudaMalloc(&d_ylens, size2);
   cudaMalloc(&d_eps, size2);
 
-  int threadsPerBlock = 1024;
-  int blocksPerGrid = (npixx_npixy + threadsPerBlock - 1) / threadsPerBlock;
+  int threadsPerBlock = 256;
+  int blocksPerGrid = (npixx_npixy) / threadsPerBlock;
 
   lensim_gpu<<<blocksPerGrid, threadsPerBlock>>>( d_xlens,  d_ylens,  d_eps,  npixx_npixy , nlenses , d_lensim);
   cudaMemcpy( &lensim(0, 0), d_lensim, size1, cudaMemcpyDeviceToHost);
@@ -109,6 +109,7 @@ int main(int argc, char* argv[])
   cudaFree(d_ylens);
   cudaFree(d_eps);
 
+  
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
   dump_array<float, 2>(lensim, "lens.fit");
