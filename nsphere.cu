@@ -39,7 +39,7 @@ __global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndi
 
   
   // Indices in x,y,z,.... 
-
+  /*
   long* index = (long*)malloc(ndim * sizeof(long));
 
 
@@ -59,7 +59,9 @@ __global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndi
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count,1.0f);
+  if (rtestsq < rsquare) 
+  */
+  atomicAdd(count,1.0f);
 
 }
 
