@@ -36,8 +36,8 @@ int main(void)
 
   // Initialize vectors
   for (n = 0; n < N; ++n) {
-    h_A[n] = 1 * n;
-    h_B[n] = 1 * n;
+    h_A[n] = 3.2333 * n;
+    h_B[n] = 8.09287 * n;
   }
 
   // Allocate in DEVICE memory
