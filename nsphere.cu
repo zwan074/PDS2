@@ -33,12 +33,11 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* count )
+__global__ void count_in_v1_gpu (long base, double rsquare, long ndim , float* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
-  const long base = 2 * halfb + 1;
-  const double rsquare = radius * radius;
+  
   // Indices in x,y,z,.... 
 
   long* index = (long*)malloc(ndim * sizeof(long));
@@ -60,7 +59,7 @@ __global__ void count_in_v1_gpu (long halfb, long radius, long ndim , float* cou
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(&count,1.0);
+  if (rtestsq < rsquare) atomicAdd(count,1.0);
 
 }
 
@@ -193,6 +192,7 @@ int main(int argc, char* argv[])
     const long halfb = static_cast<long>(floor(r));
     const long base = 2 * halfb + 1;
     const long ntotal = powlong(base, nd);
+    const double rsquare = r * r;
 
     float h_count;
     float *d_count;
@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
-    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( halfb, r,nd,d_count );
+    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( base, rsquare, nd, d_count );
     cudaMemcpy( &h_count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
 
     
