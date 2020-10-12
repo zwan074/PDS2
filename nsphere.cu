@@ -33,7 +33,7 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long base, double rsquare, long ndim , float* count )
+__global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndim , float* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
-    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( base, rsquare, nd, d_count );
+    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( base, halfb, rsquare, nd, d_count );
     cudaMemcpy( &h_count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
 
     
