@@ -59,7 +59,7 @@ __global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndi
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count[0],1.0);
+  if (rtestsq < rsquare) atomicAdd(count[0],1.0f);
 
 }
 
@@ -196,10 +196,12 @@ int main(int argc, char* argv[])
 
     float* h_count = (float*)malloc(sizeof(float));
     float *d_count;
- 
+    
     h_count[0] = 0 ;
 
+    cudaMemcpy(d_count, h_count, sizeof(float), cudaMemcpyHostToDevice);
     cudaMalloc(&d_count, sizeof(float));
+    
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
