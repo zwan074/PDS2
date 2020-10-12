@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
   const int nrequired = npixx * npixy;
   const int ITMAX = 1000000;
 
-  std::vector<int> iter(NUM_THREADS) ;
+  int iter = 0;
   std::vector<int> nconverged(NUM_THREADS) ;
     
   // Draw the printed circuit components
@@ -147,9 +147,9 @@ int main(int argc, char* argv[])
     #pragma omp barrier
     
 
-    #pragma omp single 
+    #pragma omp single {
       fix_boundaries2(g); // doing once ?
-    
+    }
       
     nconverged[id] = 0;
 
@@ -163,10 +163,12 @@ int main(int argc, char* argv[])
       }
     }
     
-    ++iter[id];
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
     #pragma omp barrier
-  } while (sum_vector(nconverged) < nrequired && sum_vector(iter) / NUM_THREADS < ITMAX);
+    #pragma omp single {
+      ++iter;
+    }
+  } while (sum_vector(nconverged) < nrequired && iter < ITMAX);
 
 }
   
@@ -175,7 +177,7 @@ int main(int argc, char* argv[])
   // This is the initial value image where the boundaries and printed
   // circuit components have been fixed
   dump_array<float, 2>(h, "plate0.fit");
-  std::cout << "Required " << sum_vector(iter)  / NUM_THREADS << " iterations" << std::endl;
+  std::cout << "Required " << iter << " iterations" << std::endl;
   std::cout << "Required " << NUM_THREADS << " Threads" << std::endl;
   std::cout << "Required " << T1-T0 << " time" << std::endl;
   // Complete the sequential version to compute the heat transfer,
