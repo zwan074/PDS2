@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     
     //const long num1 = count_in_v1(nd, r);
     //const long num2 = count_in_v2(nd, r);
-    std::cout << " -> " << h_count << std::endl;
+    std::cout << " -> " << h_count[0] << std::endl;
     cudaFree(d_count);
   }
 
