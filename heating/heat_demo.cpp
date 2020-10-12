@@ -107,8 +107,7 @@ int main(int argc, char* argv[])
   
   id = omp_get_thread_num();
   nthrds = omp_get_num_threads();
-  double T00, T11;
-  T00 = omp_get_wtime();
+
   step =  npixx / nthrds; 
   //one thread case
   if (nthrds == 1) {
@@ -139,8 +138,7 @@ int main(int argc, char* argv[])
   //std::cout << id << " " << step << " step " << std::endl;
   std::cout << id << " " << p_start1 << " p_start1 " << p_end1 << " p_end1 " << std::endl;
   std::cout << id << " " << p_start2 << " p_start2 " << p_end2 << " p_end2 " << std::endl;
-  T11 = omp_get_wtime();
-  std::cout << "Required " << T11-T00 << " time" << std::endl;
+
   do {
     for (int y = p_start1; y < p_end1; ++y) {
       for (int x = 1; x < npixx-1; ++x) {
@@ -168,7 +166,7 @@ int main(int argc, char* argv[])
     }
     
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
-    #pragma omp barrier
+    //#pragma omp barrier
     #pragma omp single 
       ++iter;
     
