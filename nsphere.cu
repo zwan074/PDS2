@@ -197,12 +197,12 @@ int main(int argc, char* argv[])
     float h_count;
     float *d_count;
 
-    cudaMalloc(&d_count, sizeof(long));
+    cudaMalloc(&d_count, sizeof(float));
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( r,nd,d_count );
-    cudaMemcpy( &h_count, d_count, sizeof(long), cudaMemcpyDeviceToHost);
+    cudaMemcpy( &h_count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
 
 
     //const long num1 = count_in_v1(nd, r);
