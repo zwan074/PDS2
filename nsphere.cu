@@ -60,7 +60,7 @@ __global__ void count_in_v1_gpu (long radius, long ndim , long* count )
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
-  if (rtestsq < rsquare) atomicAdd(count,1.0l);
+  if (rtestsq < rsquare) atomicAdd(count,1.0);
 
 }
 
@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
 
     const long halfb = static_cast<long>(floor(r));
     const long base = 2 * halfb + 1;
-    const long ntotal = powlong(base, ndim);
+    const long ntotal = powlong(base, nd);
 
     long h_count;
     long *d_count;
