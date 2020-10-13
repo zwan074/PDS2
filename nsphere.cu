@@ -33,11 +33,12 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
+__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
-  
+  if (n > ntotal)
+    return;
   // Indices in x,y,z,.... 
   /*
   long* index = (long*)malloc(ndim * sizeof(long));
@@ -198,17 +199,17 @@ int main(int argc, char* argv[])
 
     std::cout << "### " << n << " " << r << " " << nd << " ... " << ntotal << std::endl;
 
-    float* h_count = (float*)malloc(sizeof(float));
-    float *d_count;
+
+    unsigned long long int *d_count;
     unsigned long long int count = 0;
     
     cudaMalloc(&d_count, sizeof(unsigned long long int));
     cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
-    int blocksPerGrid = ntotal / threadsPerBlock;
+    int blocksPerGrid = ( ntotal + 1 )/ threadsPerBlock;
 
-    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( base, halfb, rsquare, nd, d_count );
+    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
     cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
 
     
