@@ -25,7 +25,7 @@
  const float YL2 =  WL;
  
  
- __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx_npixy ,int nlenses , float* lensim)
+ __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx, int npixy ,int nlenses , float* lensim)
  {
    
    int i = blockDim.x * blockIdx.x + threadIdx.x;
