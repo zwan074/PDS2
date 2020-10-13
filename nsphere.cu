@@ -33,7 +33,7 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndim , float* count )
+__global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -61,7 +61,7 @@ __global__ void count_in_v1_gpu (long base, long halfb, double rsquare, long ndi
   }
   if (rtestsq < rsquare) 
   */
-  atomicAdd(count,1.0f);
+  atomicAdd(count,1);
 
 }
 
@@ -189,25 +189,27 @@ int main(int argc, char* argv[])
     // Get a random value for the number of dimensions between 1 and
     // MAXDIM inclusive
     const long  nd = lrand48() % (MAXDIM - 1) + 1;
-    std::cout << "### " << n << " " << r << " " << nd << " ... " << std::endl;
+    
 
     const long halfb = static_cast<long>(floor(r));
     const long base = 2 * halfb + 1;
     const long ntotal = powlong(base, nd);
     const double rsquare = r * r;
 
+    std::cout << "### " << n << " " << r << " " << nd << " ... " << ntotal << std::endl;
+
     float* h_count = (float*)malloc(sizeof(float));
     float *d_count;
-    float count = 0.0;
-
-    cudaMalloc(&d_count, sizeof(float));
-    cudaMemcpy(d_count, &count, sizeof(float), cudaMemcpyHostToDevice);
+    unsigned long long int count = 0;
+    
+    cudaMalloc(&d_count, sizeof(unsigned long long int));
+    cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
     int blocksPerGrid = ntotal / threadsPerBlock;
 
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( base, halfb, rsquare, nd, d_count );
-    cudaMemcpy( &count, d_count, sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
 
     
     //const long num1 = count_in_v1(nd, r);
