@@ -37,10 +37,10 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
-  if (n > ntotal)
+  if (n >= ntotal)
     return;
   // Indices in x,y,z,.... 
-  /*
+  
   long* index = (long*)malloc(ndim * sizeof(long));
 
 
@@ -61,8 +61,7 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
     rtestsq += xk * xk;
   }
   if (rtestsq < rsquare) 
-  */
-  atomicAdd(count,1);
+    atomicAdd(count,1);
 
 }
 
@@ -181,15 +180,15 @@ int main(int argc, char* argv[])
   const long ntrials = 20;
 
 
-  for (long n = 0; n < ntrials; ++n) {
+  //for (long n = 0; n < ntrials; ++n) {
 
     
     // Get a random value for the hypersphere radius between the two limits
-    const double r = drand48() * (RMAX - RMIN) + RMIN;
+    const double r = 1.5; //drand48() * (RMAX - RMIN) + RMIN;
 
     // Get a random value for the number of dimensions between 1 and
     // MAXDIM inclusive
-    const long  nd = lrand48() % (MAXDIM - 1) + 1;
+    const long  nd = 3.0//lrand48() % (MAXDIM - 1) + 1;
     
 
     const long halfb = static_cast<long>(floor(r));
@@ -207,17 +206,17 @@ int main(int argc, char* argv[])
     cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
-    int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
+    unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
 
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
     cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
-
+    cudaFree(d_count);
     
     //const long num1 = count_in_v1(nd, r);
     //const long num2 = count_in_v2(nd, r);
     std::cout << " -> " << count << std::endl;
-    cudaFree(d_count);
-  }
+    free(&count);
+  //}
 
 
 
