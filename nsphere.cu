@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
-    int blocksPerGrid = ( ntotal + 1 )/ threadsPerBlock;
+    int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
 
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
     cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
