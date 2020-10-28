@@ -14,7 +14,6 @@ To run (for example to make a 100X100 pixel image):
 #include "arrayff.hxx"
 #include "draw.hxx"
 
-#define NUM_THREADS 2
 
 int heat_seq(int argc) 
 {
@@ -74,6 +73,10 @@ int sum_vector(std::vector<int> vector) {
 
 int main(int argc, char* argv[]) 
 {
+  int NUM_THREADS =atoi(argv[2]) ;
+
+  if (NUM_THREADS < 1) return;
+
   heat_seq(atoi(argv[1])) ;
   // X and Y dimensions. Force it to be a square.
   const int npix = atoi(argv[1]);
@@ -166,7 +169,8 @@ int main(int argc, char* argv[])
         h(y, x) = g(y, x);
       }
     }
-    shared_nconverged += nconverged;
+    #pragma omp atomic 
+      shared_nconverged += nconverged;
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
     //#pragma omp barrier
     #pragma omp single 
