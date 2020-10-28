@@ -94,12 +94,13 @@ int main(int argc, char* argv[])
   
   omp_set_num_threads(NUM_THREADS);
 
+  int  id,nthrds, p_start1,p_end1,p_start2,p_end2 , step;
+
   double T0, T1;
   T0 = omp_get_wtime();
 
-  #pragma omp parallel 
+  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) public (shared_nconverged)
 {
-  int i, id,nthrds, p_start1,p_end1,p_start2,p_end2 , step;
   
   id = omp_get_thread_num();
   nthrds = omp_get_num_threads();
@@ -136,8 +137,6 @@ int main(int argc, char* argv[])
   std::cout << id << " " << p_start2 << " p_start2 " << p_end2 << " p_end2 " << std::endl;
 
   do {
-
-    
 
     for (int y = p_start1; y < p_end1; ++y) {
       for (int x = 1; x < npixx-1; ++x) {
