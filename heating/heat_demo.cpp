@@ -64,18 +64,11 @@ int heat_seq(int argc)
   std::cout << "Seq Required " << T1-T0 << " time" << std::endl;
 }
 
-int sum_vector(std::vector<int> vector) {
-  int ret = 0 ;
-  for (int i = 0 ; i < NUM_THREADS; i++) 
-    ret += vector[i];
-  return ret;
-}
-
 int main(int argc, char* argv[]) 
 {
   int NUM_THREADS =atoi(argv[2]) ;
 
-  if (NUM_THREADS < 1) return;
+  if (NUM_THREADS < 1) return 0;
 
   heat_seq(atoi(argv[1])) ;
   // X and Y dimensions. Force it to be a square.
@@ -95,7 +88,7 @@ int main(int argc, char* argv[])
 
   int iter = 0;
   int shared_nconverged = 0 ;
-    
+  int nconverged = 0;  
   // Draw the printed circuit components
   fix_boundaries2<float>(h);
   
@@ -144,7 +137,9 @@ int main(int argc, char* argv[])
 
   do {
 
-
+    shared_nconverged = 0;
+    nconverged = 0;
+    
     for (int y = p_start1; y < p_end1; ++y) {
       for (int x = 1; x < npixx-1; ++x) {
         g(y, x) = 0.25 * (h(y, x-1) + h(y, x+1) + h(y-1, x) + h(y+1,x));
@@ -158,7 +153,7 @@ int main(int argc, char* argv[])
       fix_boundaries2(g); // doing once ?
     
       
-    int nconverged = 0;
+    
 
     for (int y = p_start2; y < p_end2; ++y) {
       for (int x = 0; x < npixx; ++x) {
