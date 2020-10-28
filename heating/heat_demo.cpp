@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   const int ITMAX = 1000000;
 
   int iter = 0;
-  std::vector<int> nconverged(NUM_THREADS) ;
+  int shared_nconverged = 0 ;
     
   // Draw the printed circuit components
   fix_boundaries2<float>(h);
@@ -140,6 +140,8 @@ int main(int argc, char* argv[])
   std::cout << id << " " << p_start2 << " p_start2 " << p_end2 << " p_end2 " << std::endl;
 
   do {
+
+
     for (int y = p_start1; y < p_end1; ++y) {
       for (int x = 1; x < npixx-1; ++x) {
         g(y, x) = 0.25 * (h(y, x-1) + h(y, x+1) + h(y-1, x) + h(y+1,x));
@@ -153,24 +155,24 @@ int main(int argc, char* argv[])
       fix_boundaries2(g); // doing once ?
     
       
-    nconverged[id] = 0;
+    int nconverged = 0;
 
     for (int y = p_start2; y < p_end2; ++y) {
       for (int x = 0; x < npixx; ++x) {
         float dhg = std::fabs(g(y, x) - h(y, x));
         if (dhg < tol) {
-            ++nconverged[id]; //affected by other processess?
+            ++nconverged; //affected by other processess?
         }
         h(y, x) = g(y, x);
       }
     }
-    
+    shared_nconverged += nconverged;
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
     //#pragma omp barrier
     #pragma omp single 
       ++iter;
     
-  } while (sum_vector(nconverged) < nrequired && iter < ITMAX);
+  } while (shared_nconverged < nrequired && iter < ITMAX);
 
 }
   
