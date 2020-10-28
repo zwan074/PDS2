@@ -137,9 +137,8 @@ int main(int argc, char* argv[])
 
   do {
 
-    shared_nconverged = 0;
-    nconverged = 0;
     
+
     for (int y = p_start1; y < p_end1; ++y) {
       for (int x = 1; x < npixx-1; ++x) {
         g(y, x) = 0.25 * (h(y, x-1) + h(y, x+1) + h(y-1, x) + h(y+1,x));
@@ -150,11 +149,12 @@ int main(int argc, char* argv[])
     
 
     #pragma omp single 
+    {
       fix_boundaries2(g); // doing once ?
+      shared_nconverged = 0;
+      nconverged = 0;
+    } 
     
-      
-    
-
     for (int y = p_start2; y < p_end2; ++y) {
       for (int x = 0; x < npixx; ++x) {
         float dhg = std::fabs(g(y, x) - h(y, x));
@@ -169,8 +169,9 @@ int main(int argc, char* argv[])
     //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
     //#pragma omp barrier
     #pragma omp single 
+    {
       ++iter;
-    
+    }
   } while (shared_nconverged < nrequired && iter < ITMAX);
 
 }
