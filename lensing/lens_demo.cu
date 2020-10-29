@@ -31,7 +31,7 @@
   return diffms; // Time difference in milliseconds
 }
 
-void lens_demo_seq(int n) 
+void lens_demo_seq(int n, float lens_scale) 
 {
   // Set up lensing system configuration - call example_1, _2, _3 or
   // _n as you wish. The positions and mass fractions of the lenses
@@ -52,7 +52,7 @@ void lens_demo_seq(int n)
   // Pixel size in physical units of the lens image. You can try finer
   // lens scale which will result in larger images (and take more
   // time).
-  const float lens_scale = 0.005;
+  //const float lens_scale = 0.005;
 
   // Size of the lens image
   const int npixx = static_cast<int>(floor((XL2 - XL1) / lens_scale)) + 1;
@@ -94,7 +94,7 @@ void lens_demo_seq(int n)
 
   clock_t tend = clock();
   double tms = diffclock(tend, tstart);
-  std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+  std::cout << "# Time elapsed in seq: " << tms << " ms " << numuse << std::endl;
 
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
@@ -155,7 +155,7 @@ void lens_demo_seq(int n)
  int main(int argc, char* argv[]) 
  {
 
-  lens_demo_seq(atoi(argv[1])) ;
+  lens_demo_seq(atof(argv[1])) ;
    // Set up lensing system configuration - call example_1, _2, _3 or
    // _n as you wish. The positions and mass fractions of the lenses
    // are stored in these arrays
@@ -164,7 +164,7 @@ void lens_demo_seq(int n)
    float* eps;
    const int nlenses = set_example_n( atoi(argv[1]) ,&xlens, &ylens, &eps);
    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
-   const float lens_scale = 0.005;
+   const float lens_scale = atof(argv[2]) ;
  
    // Size of the lens image
    const int npixx = static_cast<int>(floor((XL2 - XL1) / lens_scale)) + 1;
