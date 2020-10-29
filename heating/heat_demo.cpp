@@ -49,12 +49,13 @@ int main(int argc, char* argv[])
 
   int  id,nthrds, p_start1,p_end1,p_start2,p_end2 , step;
 
-  std::cout << "Required " << omp_get_wtime()-T0 << " time" << std::endl;
+  std::cout << "Seq Time : " << omp_get_wtime()-T0 << " time" << std::endl;
   
-  
+  T2 = omp_get_wtime();
+
   #pragma omp parallel private (T2, id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) 
 {
-  T2 = omp_get_wtime();
+  
 
   nthrds = omp_get_num_threads();
   step =  npixx / nthrds; 
@@ -118,26 +119,25 @@ int main(int argc, char* argv[])
     }
 
     #pragma omp atomic 
-    {
       shared_nconverged += nconverged;
-    }
     
-    #pragma omp barrier
     #pragma omp single 
     {
       ++iter;
     }
+    #pragma omp barrier
   } while (shared_nconverged < nrequired && iter < ITMAX);
 
-  std::cout << "Required " << omp_get_wtime()-T2 << " time" << std::endl;
+  
 }
 
   // This is the initial value image where the boundaries and printed
   // circuit components have been fixed
   dump_array<float, 2>(h, "plate0.fit");
+  std::cout << "Parallel Time : " << omp_get_wtime()-T2 << " time" << std::endl;
   std::cout << "Required " << iter << " iterations" << std::endl;
   std::cout << "Required " << NUM_THREADS << " Threads" << std::endl;
-  std::cout << "Required " << omp_get_wtime()-T1 << " time" << std::endl;
+  std::cout << "Total Time " << omp_get_wtime()-T1 << " time" << std::endl;
   // Complete the sequential version to compute the heat transfer,
   // then make a parallel version of it
 }
