@@ -99,12 +99,12 @@ int main(int argc, char* argv[])
   double T0, T1;
   T0 = omp_get_wtime();
 
+  
+
+  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) shared (shared_nconverged)
+{
   nthrds = omp_get_num_threads();
   step =  npixx / nthrds; 
-
-  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) 
-{
-  
   id = omp_get_thread_num();
   
   //one thread case
