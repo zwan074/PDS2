@@ -31,7 +31,7 @@
   return diffms; // Time difference in milliseconds
 }
 
-int lens_demo_seq(int n) 
+void lens_demo_seq(int n) 
 {
   // Set up lensing system configuration - call example_1, _2, _3 or
   // _n as you wish. The positions and mass fractions of the lenses
@@ -171,7 +171,11 @@ int lens_demo_seq(int n)
    const int npixy = static_cast<int>(floor((YL2 - YL1) / lens_scale)) + 1;
    std::cout << "# Building " << npixx << "X" << npixy << " lens image" << std::endl;
    const int npixx_npixy = npixx * npixy;
- 
+
+   cudaEvent_t start, stop;
+   cudaEventCreate(&start);
+   cudaEventCreate(&stop);
+
    // Put the lens image in this array
    Array<float, 2> lensim(npixy, npixx);
  
