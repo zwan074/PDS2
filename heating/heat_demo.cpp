@@ -15,64 +15,15 @@ To run (for example to make a 100X100 pixel image):
 #include "draw.hxx"
 
 
-int heat_seq(int argc) 
-{
-  const float tol = 0.00001;
-  const int npix = argc;
-  const int npixx = npix;
-  const int npixy = npix;
-  const int ntotal = npixx * npixy;
- 
-  Array<float, 2> h(npixy, npixy), g(npixy, npixx);
-
-  const int nrequired = npixx * npixy;
-  const int ITMAX = 1000000;
-
-  int iter = 0;
-  int nconverged = 0;
-
-  fix_boundaries2(h);
-
-  double T0, T1;
-  T0 = omp_get_wtime();
-
-  do {
-
-    for (int y = 1; y < npixy-1; ++y) {
-      for (int x = 1; x < npixx-1; ++x) {
-	      g(y, x) = 0.25 * (h(y, x-1) + h(y, x+1) + h(y-1, x) + h(y+1,x));
-      }
-    }
-
-    fix_boundaries2(g);
-
-    nconverged = 0;
-    for (int y = 0; y < npixy; ++y) {
-      for (int x = 0; x < npixx; ++x) {
-        float dhg = std::fabs(g(y, x) - h(y, x));
-        if (dhg < tol) ++nconverged;
-        h(y, x) = g(y, x);
-      }
-    }
-    ++iter;
-
-  } while (nconverged < nrequired && iter < ITMAX);
-  T1 = omp_get_wtime();
-  
-  std::cout << "Seq Required " << iter << " iterations" << std::endl;
-  std::cout << "Seq Required " << T1-T0 << " time" << std::endl;
-}
-
 int main(int argc, char* argv[]) 
 {
   int NUM_THREADS =atoi(argv[2]) ;
   if (NUM_THREADS < 1) return 0;
-  heat_seq(atoi(argv[1])) ;
 
-  double T0, T1;
+  double T0, T1 ,T2;
   T0 = omp_get_wtime();
   T1 = omp_get_wtime();
-  
+
   // X and Y dimensions. Force it to be a square.
   const int npix = atoi(argv[1]);
   const int npixx = npix;
@@ -101,8 +52,10 @@ int main(int argc, char* argv[])
   std::cout << "Required " << omp_get_wtime()-T0 << " time" << std::endl;
   
   
-  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) 
+  #pragma omp parallel private (T2, id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) 
 {
+  T2 = omp_get_wtime();
+
   nthrds = omp_get_num_threads();
   step =  npixx / nthrds; 
   id = omp_get_thread_num();
@@ -163,6 +116,7 @@ int main(int argc, char* argv[])
         h(y, x) = g(y, x);
       }
     }
+
     #pragma omp atomic 
     {
       shared_nconverged += nconverged;
@@ -175,9 +129,8 @@ int main(int argc, char* argv[])
     }
   } while (shared_nconverged < nrequired && iter < ITMAX);
 
+  std::cout << "Required " << omp_get_wtime()-T2 << " time" << std::endl;
 }
-  
-  T1 = omp_get_wtime();
 
   // This is the initial value image where the boundaries and printed
   // circuit components have been fixed
