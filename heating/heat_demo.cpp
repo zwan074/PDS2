@@ -36,7 +36,6 @@ int heat_seq(int argc)
   double T0, T1;
   T0 = omp_get_wtime();
 
-
   do {
 
     for (int y = 1; y < npixy-1; ++y) {
@@ -67,10 +66,13 @@ int heat_seq(int argc)
 int main(int argc, char* argv[]) 
 {
   int NUM_THREADS =atoi(argv[2]) ;
-
   if (NUM_THREADS < 1) return 0;
-
   heat_seq(atoi(argv[1])) ;
+
+  double T0, T1;
+  T0 = omp_get_wtime();
+  T1 = omp_get_wtime();
+  
   // X and Y dimensions. Force it to be a square.
   const int npix = atoi(argv[1]);
   const int npixx = npix;
@@ -96,12 +98,10 @@ int main(int argc, char* argv[])
 
   int  id,nthrds, p_start1,p_end1,p_start2,p_end2 , step;
 
-  double T0, T1;
-  T0 = omp_get_wtime();
-
+  std::cout << "Required " << omp_get_wtime()-T0 << " time" << std::endl;
   
-
-  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) shared (shared_nconverged)
+  
+  #pragma omp parallel private (id,nthrds, p_start1,p_end1,p_start2,p_end2 , step,nconverged) 
 {
   nthrds = omp_get_num_threads();
   step =  npixx / nthrds; 
@@ -111,8 +111,8 @@ int main(int argc, char* argv[])
   if (nthrds == 1) {
     p_start1 = 1 ;
     p_start2 = 0 ;
-    p_end1 = npixx - 1;
-    p_end2 = npixx;
+    p_end1 = npixy - 1;
+    p_end2 = npixy;
   }
   else if (id == 0) { 
     p_start1 = 1 ;
@@ -123,8 +123,8 @@ int main(int argc, char* argv[])
   else if (id == (nthrds - 1) ) {
     p_start1 = id * step ;
     p_start2 = p_start1 ;
-    p_end1 = npixx - 1;
-    p_end2 = npixx;
+    p_end1 = npixy - 1;
+    p_end2 = npixy;
   }
   else {
     p_start1 = id * step ;
@@ -133,9 +133,8 @@ int main(int argc, char* argv[])
     p_end2 = p_end1;
   }
   
-  //std::cout << id << " " << step << " step " << std::endl;
-  std::cout << id << " " << p_start1 << " p_start1 " << p_end1 << " p_end1 " << std::endl;
-  std::cout << id << " " << p_start2 << " p_start2 " << p_end2 << " p_end2 " << std::endl;
+  //std::cout << id << " " << p_start1 << " p_start1 " << p_end1 << " p_end1 " << std::endl;
+  //std::cout << id << " " << p_start2 << " p_start2 " << p_end2 << " p_end2 " << std::endl;
 
   do {
 
@@ -147,27 +146,29 @@ int main(int argc, char* argv[])
     
     #pragma omp barrier
     
-
     #pragma omp single 
     {
-      fix_boundaries2(g); // doing once ?
+      fix_boundaries2(g); 
       shared_nconverged = 0;
-      nconverged = 0;
     } 
-    
+
+    nconverged = 0;
+
     for (int y = p_start2; y < p_end2; ++y) {
       for (int x = 0; x < npixx; ++x) {
         float dhg = std::fabs(g(y, x) - h(y, x));
         if (dhg < tol) {
-            ++nconverged; //affected by other processess?
+            ++nconverged; 
         }
         h(y, x) = g(y, x);
       }
     }
     #pragma omp atomic 
+    {
       shared_nconverged += nconverged;
-    //std::cout << id << " " << sum_vector(iter) << " iterations " << sum_vector(nconverged)  << " nconverged" << std::endl;
-    //#pragma omp barrier
+    }
+    
+    #pragma omp barrier
     #pragma omp single 
     {
       ++iter;
@@ -183,7 +184,7 @@ int main(int argc, char* argv[])
   dump_array<float, 2>(h, "plate0.fit");
   std::cout << "Required " << iter << " iterations" << std::endl;
   std::cout << "Required " << NUM_THREADS << " Threads" << std::endl;
-  std::cout << "Required " << T1-T0 << " time" << std::endl;
+  std::cout << "Required " << omp_get_wtime()-T1 << " time" << std::endl;
   // Complete the sequential version to compute the heat transfer,
   // then make a parallel version of it
 }
