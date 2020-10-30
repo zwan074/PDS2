@@ -172,7 +172,7 @@ void lens_demo_seq(int n, float lens_scale)
    float* ylens;
    float* eps;
    //const int nlenses = set_example_n( atoi(argv[1]) ,&xlens, &ylens, &eps);
-   const int n = atof(argv[2]);
+   const int n = atoi(argv[1]);
    int nlenses;
    if ( n == 1 ) 
     nlenses = set_example_1(&xlens, &ylens, &eps);
