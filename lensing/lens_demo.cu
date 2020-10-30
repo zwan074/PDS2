@@ -174,16 +174,26 @@ void lens_demo_seq(int n, float lens_scale)
    //const int nlenses = set_example_n( atoi(argv[1]) ,&xlens, &ylens, &eps);
    const int n = atoi(argv[1]);
    int nlenses;
-   if ( n == 1 ) 
+   if ( n == 1 ) {
     nlenses = set_example_1(&xlens, &ylens, &eps);
-   else if (n == 2)
+    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
+   }
+    
+   else if (n == 2){
     nlenses = set_example_2(&xlens, &ylens, &eps);
-   else if (n == 3)
+    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
+   }
+    
+   else if (n == 3){
     nlenses = set_example_3(&xlens, &ylens, &eps);
-   else
+    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
+   }
+    
+   else{
     nlenses = set_example_n(n,&xlens, &ylens, &eps);
-
-   std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
+    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
+   }
+   
    const float lens_scale = atof(argv[2]) ;
  
    // Size of the lens image
