@@ -163,8 +163,10 @@ void lens_demo_seq(int n, float lens_scale)
  
  int main(int argc, char* argv[]) 
  {
+  const int n = atoi(argv[1]);
+  const float lens_scale = atof(argv[2]) ;
 
-  lens_demo_seq(atoi(argv[1]),atof(argv[2])) ;
+  lens_demo_seq(n,lens_scale) ;
    // Set up lensing system configuration - call example_1, _2, _3 or
    // _n as you wish. The positions and mass fractions of the lenses
    // are stored in these arrays
@@ -172,7 +174,7 @@ void lens_demo_seq(int n, float lens_scale)
    float* ylens;
    float* eps;
    //const int nlenses = set_example_n( atoi(argv[1]) ,&xlens, &ylens, &eps);
-   const int n = atoi(argv[1]);
+   
    int nlenses;
    if ( n == 1 ) {
     nlenses = set_example_1(&xlens, &ylens, &eps);
@@ -194,7 +196,7 @@ void lens_demo_seq(int n, float lens_scale)
     std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
    }
    
-   const float lens_scale = atof(argv[2]) ;
+   
  
    // Size of the lens image
    const int npixx = static_cast<int>(floor((XL2 - XL1) / lens_scale)) + 1;
