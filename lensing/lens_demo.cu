@@ -24,96 +24,6 @@
  const float YL1 = -WL;
  const float YL2 =  WL;
  
- double diffclock(clock_t clock1,clock_t clock2)
-{
-  double diffticks = clock1 - clock2;
-  double diffms = (diffticks * 1000) / CLOCKS_PER_SEC;
-  return diffms; // Time difference in milliseconds
-}
-
-double lens_demo_seq(int n, float lens_scale) 
-{
-  // Set up lensing system configuration - call example_1, _2, _3 or
-  // _n as you wish. The positions and mass fractions of the lenses
-  // are stored in these arrays
-  float* xlens_seq;
-  float* ylens_seq;
-  float* eps_seq;
-  int nlenses;
-  if ( n == 1 ) 
-    nlenses = set_example_1(&xlens_seq, &ylen_seq, &eps_seq);
-  else if (n == 2)
-    nlenses = set_example_2(&xlens_seq, &ylen_seq, &eps_seq);
-  else if (n == 3)
-    nlenses = set_example_3(&xlens_seq, &ylen_seq, &eps_seq);
-  else
-    nlenses = set_example_n(n,&xlens_seq, &ylen_seq, &eps_seq);
-
-  std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
-
-  // Source star parameters. You can adjust these if you like - it is
-  // interesting to look at the different lens images that result
-  const float rsrc = 0.1;      // radius
-  const float ldc  = 0.5;      // limb darkening coefficient
-  const float xsrc = 0.0;      // x and y centre on the map
-  const float ysrc = 0.0;
-
-  // Pixel size in physical units of the lens image. You can try finer
-  // lens scale which will result in larger images (and take more
-  // time).
-  //const float lens_scale = 0.005;
-
-  // Size of the lens image
-  const int npixx = static_cast<int>(floor((XL2 - XL1) / lens_scale)) + 1;
-  const int npixy = static_cast<int>(floor((YL2 - YL1) / lens_scale)) + 1;
-  std::cout << "# Building " << npixx << "X" << npixy << " lens image" << std::endl;
-
-  // Put the lens image in this array
-  Array<float, 2> lensim_seq(npixy, npixx);
-
-  clock_t tstart = clock();
-
-  // Draw the lensing image map here. For each pixel, shoot a ray back
-  // to the source plane, then test whether or or not it hits the
-  // source star
-  const float rsrc2 = rsrc * rsrc;
-  float xl, yl, xs, ys, sep2, mu;
-  float xd, yd;
-  int numuse = 0;
-  for (int iy = 0; iy < npixy; ++iy) 
-  for (int ix = 0; ix < npixx; ++ix) { 
-    
-    // YOU NEED TO COMPLETE THIS SECTION OF CODE
-
-    // need position on lens in physical units
-
-    // shoot a ray back to the source plane - make the appropriate
-    // call to shoot() in lenses.h
-
-    // does the ray hit the source star?
-    shoot(xs, ys, xl, yl, xlens, ylens, eps, nlenses);
-    xd = xs - xsrc;
-    yd = ys - ysrc;
-    sep2 = xd * xd + yd * yd;
-    if (sep2 < rsrc2) {
-      mu = sqrt(1 - sep2 / rsrc2);
-      lensim_seq(iy, ix) = 1.0 - ldc * (1 - mu);
-    }
-  }
-
-  clock_t tend = clock();
-  double tms = diffclock(tend, tstart);
-  std::cout << "# Time elapsed in seq: " << tms << " ms " << numuse << std::endl;
-
-  // Write the lens image to a FITS formatted file. You can view this
-  // image file using ds9
-  dump_array<float, 2>(lensim_seq, "lens_seq.fit");
-
-  delete[] xlens_seq;
-  delete[] ylens_seq;
-  delete[] eps_seq;
-}
- 
  __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx, int npixy ,int nlenses , float* lensim)
  {
    
@@ -166,7 +76,6 @@ double lens_demo_seq(int n, float lens_scale)
   const int n = atoi(argv[1]);
   const float lens_scale = atof(argv[2]) ;
 
-  lens_demo_seq(n,lens_scale) ;
    // Set up lensing system configuration - call example_1, _2, _3 or
    // _n as you wish. The positions and mass fractions of the lenses
    // are stored in these arrays
