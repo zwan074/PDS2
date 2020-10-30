@@ -31,23 +31,23 @@
   return diffms; // Time difference in milliseconds
 }
 
-void lens_demo_seq(int n, float lens_scale) 
+double lens_demo_seq(int n, float lens_scale) 
 {
   // Set up lensing system configuration - call example_1, _2, _3 or
   // _n as you wish. The positions and mass fractions of the lenses
   // are stored in these arrays
-  float* xlens;
-  float* ylens;
-  float* eps;
+  float* xlens_seq;
+  float* ylens_seq;
+  float* eps_seq;
   int nlenses;
   if ( n == 1 ) 
-    nlenses = set_example_1(&xlens, &ylens, &eps);
+    nlenses = set_example_1(&xlens_seq, &ylen_seq, &eps_seq);
   else if (n == 2)
-    nlenses = set_example_2(&xlens, &ylens, &eps);
+    nlenses = set_example_2(&xlens_seq, &ylen_seq, &eps_seq);
   else if (n == 3)
-    nlenses = set_example_3(&xlens, &ylens, &eps);
+    nlenses = set_example_3(&xlens_seq, &ylen_seq, &eps_seq);
   else
-    nlenses = set_example_n(n,&xlens, &ylens, &eps);
+    nlenses = set_example_n(n,&xlens_seq, &ylen_seq, &eps_seq);
 
   std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
 
@@ -109,9 +109,9 @@ void lens_demo_seq(int n, float lens_scale)
   // image file using ds9
   dump_array<float, 2>(lensim_seq, "lens_seq.fit");
 
-  delete[] xlens;
-  delete[] ylens;
-  delete[] eps;
+  delete[] xlens_seq;
+  delete[] ylens_seq;
+  delete[] eps_seq;
 }
  
  __global__ void lensim_gpu(float* xlens, float* ylens, float* eps, int npixx, int npixy ,int nlenses , float* lensim)
@@ -166,7 +166,7 @@ void lens_demo_seq(int n, float lens_scale)
   const int n = atoi(argv[1]);
   const float lens_scale = atof(argv[2]) ;
 
-  //lens_demo_seq(n,lens_scale) ;
+  lens_demo_seq(n,lens_scale) ;
    // Set up lensing system configuration - call example_1, _2, _3 or
    // _n as you wish. The positions and mass fractions of the lenses
    // are stored in these arrays
