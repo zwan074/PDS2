@@ -184,11 +184,11 @@ int main(int argc, char* argv[])
 
     
     // Get a random value for the hypersphere radius between the two limits
-    const double r = 100.0; //drand48() * (RMAX - RMIN) + RMIN;
+    const double r = atod(argv[1]); //drand48() * (RMAX - RMIN) + RMIN;
 
     // Get a random value for the number of dimensions between 1 and
     // MAXDIM inclusive
-    const long  nd = 3.0;//lrand48() % (MAXDIM - 1) + 1;
+    const long  nd = atol(argv[2]);//lrand48() % (MAXDIM - 1) + 1;
     
 
     const long halfb = static_cast<long>(floor(r));
