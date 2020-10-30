@@ -166,7 +166,7 @@ void lens_demo_seq(int n, float lens_scale)
   const int n = atoi(argv[1]);
   const float lens_scale = atof(argv[2]) ;
 
-  lens_demo_seq(n,lens_scale) ;
+  //lens_demo_seq(n,lens_scale) ;
    // Set up lensing system configuration - call example_1, _2, _3 or
    // _n as you wish. The positions and mass fractions of the lenses
    // are stored in these arrays
