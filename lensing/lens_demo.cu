@@ -69,7 +69,7 @@ void lens_demo_seq(int n, float lens_scale)
   std::cout << "# Building " << npixx << "X" << npixy << " lens image" << std::endl;
 
   // Put the lens image in this array
-  Array<float, 2> lensim(npixy, npixx);
+  Array<float, 2> lensim_seq(npixy, npixx);
 
   clock_t tstart = clock();
 
@@ -97,7 +97,7 @@ void lens_demo_seq(int n, float lens_scale)
     sep2 = xd * xd + yd * yd;
     if (sep2 < rsrc2) {
       mu = sqrt(1 - sep2 / rsrc2);
-      lensim(iy, ix) = 1.0 - ldc * (1 - mu);
+      lensim_seq(iy, ix) = 1.0 - ldc * (1 - mu);
     }
   }
 
@@ -107,7 +107,7 @@ void lens_demo_seq(int n, float lens_scale)
 
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
-  //dump_array<float, 2>(lensim, "lens.fit");
+  dump_array<float, 2>(lensim_seq, "lens_seq.fit");
 
   delete[] xlens;
   delete[] ylens;
