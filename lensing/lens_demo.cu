@@ -39,14 +39,15 @@ void lens_demo_seq(int n, float lens_scale)
   float* xlens;
   float* ylens;
   float* eps;
+  const int nlenses;
   if ( n == 1 ) 
-    const int nlenses = set_example_1(&xlens, &ylens, &eps);
+    nlenses = set_example_1(&xlens, &ylens, &eps);
   else if (n == 2)
-    const int nlenses = set_example_2(&xlens, &ylens, &eps);
+    nlenses = set_example_2(&xlens, &ylens, &eps);
   else if (n == 3)
-    const int nlenses = set_example_3(&xlens, &ylens, &eps);
+    nlenses = set_example_3(&xlens, &ylens, &eps);
   else
-    const int nlenses = set_example_n(n,&xlens, &ylens, &eps);
+    nlenses = set_example_n(n,&xlens, &ylens, &eps);
 
   std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
 
@@ -172,14 +173,15 @@ void lens_demo_seq(int n, float lens_scale)
    float* eps;
    //const int nlenses = set_example_n( atoi(argv[1]) ,&xlens, &ylens, &eps);
    const int n = atof(argv[2]);
+   const int nlenses;
    if ( n == 1 ) 
-    const int nlenses = set_example_1(&xlens, &ylens, &eps);
+    nlenses = set_example_1(&xlens, &ylens, &eps);
    else if (n == 2)
-    const int nlenses = set_example_2(&xlens, &ylens, &eps);
+    nlenses = set_example_2(&xlens, &ylens, &eps);
    else if (n == 3)
-    const int nlenses = set_example_3(&xlens, &ylens, &eps);
+    nlenses = set_example_3(&xlens, &ylens, &eps);
    else
-    const int nlenses = set_example_n(n,&xlens, &ylens, &eps);
+    nlenses = set_example_n(n,&xlens, &ylens, &eps);
 
    std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
    const float lens_scale = atof(argv[2]) ;
