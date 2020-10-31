@@ -49,27 +49,27 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
     return;
   // Indices in x,y,z,.... 
   
-  long* index = (long*)malloc(ndim * sizeof(long));
+  //long* index = (long*)malloc(ndim * sizeof(long));
 
-
-  for (long i = 0; i < ndim; ++i) index[i] = 0;
+  //for (long i = 0; i < ndim; ++i) index[i] = 0;
   
   long idx = 0;
+
+  double rtestsq = 0;
   while (n != 0) {
     long rem = n % base;
     n = n / base;
     double xk = rem - halfb;
     rtestsq += xk * xk;
     //index[idx] = rem;
-    //++idx;
+    ++idx;
   }
 
-  double rtestsq = 0;
 
-  //for (long k = 0; k < ndim; ++k) {
-    //double xk = index[k] - halfb;
-    //rtestsq += xk * xk;
-  //}
+  for (long k = idx; k < ndim; ++k) {
+    double xk = 0 - halfb;
+    rtestsq += xk * xk;
+  }
 
   if (rtestsq < rsquare) 
     atomicAdd(count,1);
