@@ -17,10 +17,18 @@
 
 #include <vector>
 #include <cuda.h>
+#include <ctime>
 
 const long MAXDIM = 10;
 const double RMIN = 2.0;
 const double RMAX = 8.0;
+
+double diffclock(clock_t clock1,clock_t clock2)
+{
+  double diffticks = clock1 - clock2;
+  double diffms = (diffticks * 1000) / CLOCKS_PER_SEC;
+  return diffms; // Time difference in milliseconds
+}
 
 long powlong(long n, long k)
 /* Evaluate n**k where both are long integers */
@@ -60,6 +68,7 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
     double xk = index[k] - halfb;
     rtestsq += xk * xk;
   }
+
   if (rtestsq < rsquare) 
     atomicAdd(count,1);
 
@@ -190,6 +199,9 @@ int main(int argc, char* argv[])
     // MAXDIM inclusive
     const long  nd = atol(argv[2]);//lrand48() % (MAXDIM - 1) + 1;
     
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
 
     const long halfb = static_cast<long>(floor(r));
     const long base = 2 * halfb + 1;
@@ -202,27 +214,40 @@ int main(int argc, char* argv[])
     cudaMalloc(&d_count, sizeof(unsigned long long int));
     cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
-    int threadsPerBlock = 256;
+    int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     
     std::cout << "### " << " " << r << " " << nd << " ... " << ntotal << std::endl;
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
-
+    cudaEventRecord(start, 0);
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float time;  // Must be a float
+    cudaEventElapsedTime(&time, start, stop);
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    std::cout << "Kernel took: " << time << " ms" << std::endl;
+
     cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
+    std::cout << " GPU -> " << count << std::endl;
     cudaFree(d_count);
     
+    clock_t tstart = clock();
     const long num1 = count_in_v1(nd, r);
-    const long num2 = count_in_v2(nd, r);
-    std::cout << " GPU -> " << count << std::endl;
+    clock_t tend = clock();
+    double tms = diffclock(tend, tstart);
     std::cout << " CPU v1-> " << num1 << std::endl;
+    std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+
+    tstart = clock();
+    const long num2 = count_in_v2(nd, r);
+    tend = clock();
+    tms = diffclock(tend, tstart);
+    
     std::cout << " CPU v2-> " << num2 << std::endl;
+    std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
   //}
-
-
-
-
-
 
 }
 
