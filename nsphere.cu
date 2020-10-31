@@ -41,7 +41,7 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , int* count )
+__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -67,7 +67,7 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
 
 
   for (long k = idx; k < ndim; ++k) {
-    double xk = 0 - halfb;
+    double xk = 0.0 - halfb;
     rtestsq += xk * xk;
   }
 
@@ -187,19 +187,9 @@ long count_in_v2(long ndim, double radius)
 
 int main(int argc, char* argv[]) 
 {
-  // You can make this larger if you want
-  const long ntrials = 20;
 
-
-  //for (long n = 0; n < ntrials; ++n) {
-
-    
-    // Get a random value for the hypersphere radius between the two limits
-    const double r = atof(argv[1]); //drand48() * (RMAX - RMIN) + RMIN;
-
-    // Get a random value for the number of dimensions between 1 and
-    // MAXDIM inclusive
-    const long  nd = atol(argv[2]);//lrand48() % (MAXDIM - 1) + 1;
+    const double r = atof(argv[1]); 
+    const long  nd = atol(argv[2]);
     
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
@@ -210,17 +200,17 @@ int main(int argc, char* argv[])
     const long ntotal = powlong(base, nd);
     const double rsquare = r * r;
 
-    int *d_count;
-    int count;
+    unsigned long long int *d_count;
+    unsigned long long int count;
     count=0 ;
 
-    cudaMalloc(&d_count, sizeof(int));
-    cudaMemcpy(d_count, &count, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_count, sizeof(unsigned long long int));
+    cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 1024;
     int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     
-    std::cout << "### " << " " << r << " " << nd << " ... " << ntotal << std::endl;
+    std::cout << "### " << " Radius " << r << "Dimension " << nd << " Total Points " << ntotal << std::endl;
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
     cudaEventRecord(start, 0);
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
@@ -231,7 +221,7 @@ int main(int argc, char* argv[])
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
   
-    cudaMemcpy( &count, d_count, sizeof(int), cudaMemcpyDeviceToHost);
+    cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
     std::cout << " GPU -> " << count << std::endl;
     std::cout << "Kernel took: " << time << " ms" << std::endl;
     cudaFree(d_count);
@@ -250,7 +240,6 @@ int main(int argc, char* argv[])
     
     std::cout << " CPU v2-> " << num2 << std::endl;
     std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
-  //}
 
 }
 
