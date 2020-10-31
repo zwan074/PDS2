@@ -43,12 +43,7 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
 
   if (n >= ntotal)
     return;
-  // Indices in x,y,z,.... 
-  
-  //long* index = (long*)malloc(ndim * sizeof(long));
 
-  //for (long i = 0; i < ndim; ++i) index[i] = 0;
-  
   long idx = 0;
 
   double rtestsq = 0;
@@ -57,10 +52,8 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
     n = n / base;
     double xk = rem - halfb;
     rtestsq += xk * xk;
-    //index[idx] = rem;
     ++idx;
   }
-
 
   for (long k = idx; k < ndim; ++k) {
     double xk = 0.0 - halfb;
@@ -180,6 +173,23 @@ long count_in_v2(long ndim, double radius)
   return count;
 }
 
+void seq_count_in_v1_v2() 
+{
+  clock_t tstart = clock();
+  const long num1 = count_in_v1(nd, r);
+  clock_t tend = clock();
+  double tms = diffclock(tend, tstart);
+  std::cout << " CPU v1-> " << num1 << std::endl;
+  std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
+
+  tstart = clock();
+  const long num2 = count_in_v2(nd, r);
+  tend = clock();
+  tms = diffclock(tend, tstart);
+  
+  std::cout << " CPU v2-> " << num2 << std::endl;
+  std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
+}
 
 int main(int argc, char* argv[]) 
 {
@@ -206,8 +216,9 @@ int main(int argc, char* argv[])
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     
-    std::cout << "### " << " Radius " << r << "Dimension " << nd << " Total Points " << ntotal << std::endl;
+    std::cout << "### " << " Radius " << r << " Dimension " << nd << " Total Points " << ntotal << std::endl;
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
+    
     cudaEventRecord(start, 0);
     count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
     cudaEventRecord(stop, 0);
@@ -222,20 +233,7 @@ int main(int argc, char* argv[])
     std::cout << "Kernel took: " << time << " ms" << std::endl;
     cudaFree(d_count);
     
-    clock_t tstart = clock();
-    const long num1 = count_in_v1(nd, r);
-    clock_t tend = clock();
-    double tms = diffclock(tend, tstart);
-    std::cout << " CPU v1-> " << num1 << std::endl;
-    std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
-
-    tstart = clock();
-    const long num2 = count_in_v2(nd, r);
-    tend = clock();
-    tms = diffclock(tend, tstart);
+    //seq_count_in_v1_v2();
     
-    std::cout << " CPU v2-> " << num2 << std::endl;
-    std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
-
 }
 
