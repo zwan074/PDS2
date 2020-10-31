@@ -41,7 +41,7 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
+__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , int* count )
 {
   int n = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 
     
     // Get a random value for the hypersphere radius between the two limits
-    const double r = atod(argv[1]); //drand48() * (RMAX - RMIN) + RMIN;
+    const double r = atof(argv[1]); //drand48() * (RMAX - RMIN) + RMIN;
 
     // Get a random value for the number of dimensions between 1 and
     // MAXDIM inclusive
@@ -211,8 +211,8 @@ int main(int argc, char* argv[])
     unsigned long long int *d_count;
     unsigned long long int count = 0;
     
-    cudaMalloc(&d_count, sizeof(unsigned long long int));
-    cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_count, sizeof(int));
+    cudaMemcpy(d_count, &count, sizeof(int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
     cudaEventDestroy(stop);
     std::cout << "Kernel took: " << time << " ms" << std::endl;
 
-    cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
+    cudaMemcpy( &count, d_count, sizeof(int), cudaMemcpyDeviceToHost);
     std::cout << " GPU -> " << count << std::endl;
     cudaFree(d_count);
     
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
     clock_t tend = clock();
     double tms = diffclock(tend, tstart);
     std::cout << " CPU v1-> " << num1 << std::endl;
-    std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+    std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
 
     tstart = clock();
     const long num2 = count_in_v2(nd, r);
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     tms = diffclock(tend, tstart);
     
     std::cout << " CPU v2-> " << num2 << std::endl;
-    std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+    std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
   //}
 
 }
