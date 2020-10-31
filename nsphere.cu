@@ -58,16 +58,18 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
   while (n != 0) {
     long rem = n % base;
     n = n / base;
-    index[idx] = rem;
-    ++idx;
+    double xk = rem - halfb;
+    rtestsq += xk * xk;
+    //index[idx] = rem;
+    //++idx;
   }
 
   double rtestsq = 0;
 
-  for (long k = 0; k < ndim; ++k) {
-    double xk = index[k] - halfb;
-    rtestsq += xk * xk;
-  }
+  //for (long k = 0; k < ndim; ++k) {
+    //double xk = index[k] - halfb;
+    //rtestsq += xk * xk;
+  //}
 
   if (rtestsq < rsquare) 
     atomicAdd(count,1);
@@ -209,12 +211,11 @@ int main(int argc, char* argv[])
     const double rsquare = r * r;
 
     int *d_count;
-    int count ;
-    count=(int *) malloc(sizeof(int));
-    
+    int count;
+    count=0 ;
+
     cudaMalloc(&d_count, sizeof(int));
-    cudaMemset(d_count, 0, sizeof(int));
-    //cudaMemcpy(d_count, &count, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_count, &count, sizeof(int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 1024;
     int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
