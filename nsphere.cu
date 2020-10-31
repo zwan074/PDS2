@@ -19,10 +19,6 @@
 #include <cuda.h>
 #include <ctime>
 
-const long MAXDIM = 10;
-const double RMIN = 2.0;
-const double RMAX = 8.0;
-
 double diffclock(clock_t clock1,clock_t clock2)
 {
   double diffticks = clock1 - clock2;
@@ -207,8 +203,8 @@ int main(int argc, char* argv[])
     cudaMalloc(&d_count, sizeof(unsigned long long int));
     cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
-    int threadsPerBlock = 1024;
-    int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
+    unsigned long long int threadsPerBlock = 1024;
+    unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     
     std::cout << "### " << " Radius " << r << "Dimension " << nd << " Total Points " << ntotal << std::endl;
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
