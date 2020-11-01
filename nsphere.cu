@@ -220,11 +220,12 @@ int main(int argc, char* argv[])
 
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
     std::cout << "size " << " " << size << " " << std::endl;
-    cudaMalloc(&d_count, sizeof(unsigned long long int));
+    
 
     if (size == 0) {
       
       count=0 ;
+      cudaMalloc(&d_count, sizeof(unsigned long long int));
       cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
       cudaEventRecord(start, 0);
@@ -256,6 +257,7 @@ int main(int argc, char* argv[])
           blocksPerGrid = rest_blocksPerGrid;
 
         count=0 ;
+        cudaMalloc(&d_count, sizeof(unsigned long long int));
         cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
   
         cudaEventRecord(start, 0);
@@ -269,6 +271,7 @@ int main(int argc, char* argv[])
       
         cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
         total_count += count;
+        
         std::cout << " GPU count -> " << i << " " << count << std::endl;
         std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
         std::cout << "Kernel took: " << time << " ms" << std::endl;
