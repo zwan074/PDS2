@@ -19,8 +19,6 @@
 #include <cuda.h>
 #include <ctime>
 
-//#define MAX_THREAD_SIZE 1073741824// 65536 x 65536
-
 double diffclock(clock_t clock1,clock_t clock2)
 {
   double diffticks = clock1 - clock2;
@@ -40,9 +38,9 @@ long powlong(long n, long k)
 
 
 __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, 
-  long ndim , unsigned long long int* count ,  unsigned long long int start)
+  long ndim , unsigned long long int* count ,  unsigned long long int start_index)
 {
-  long n = start + blockDim.x * blockIdx.x + threadIdx.x;
+  long n = start_index + blockDim.x * blockIdx.x + threadIdx.x;
 
   if (n < ntotal) {
 
@@ -210,7 +208,7 @@ int main(int argc, char* argv[])
     unsigned long long int *d_count;
     unsigned long long int count;
     unsigned long long int total_count = 0;
-    unsigned long long int MAX_THREAD_SIZE = 1073741824;
+    unsigned long long int MAX_THREAD_SIZE = 2147483648;// 1073741824;
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     int size =  (blocksPerGrid * threadsPerBlock )/ MAX_THREAD_SIZE;
@@ -250,7 +248,6 @@ int main(int argc, char* argv[])
       total_count += count;
       
       std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
-      std::cout << " GPU count -> " << start_i << " " << count << std::endl;
       std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
       std::cout << "Kernel took: " << time << " ms" << std::endl;
 
