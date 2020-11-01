@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
         std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
         for (long j = 0; j < size+1; j++)
         {
-            std::cout << "GPU ->" << " " << counters[j] << " " << std::endl;
+            std::cout << "GPU ->" << " " << j << " " << counters[j] << " " << std::endl;
         }
         
         std::cout << "Kernel took: " << time << " ms" << std::endl;
