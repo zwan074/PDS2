@@ -205,8 +205,7 @@ int main(int argc, char* argv[])
     const long ntotal = powlong(base, nd);
     const double rsquare = r * r;
     std::cout << "### " << " Radius " << r << " Dimension " << nd << " Total Points " << ntotal << std::endl;
-    unsigned long long int *d_count;
-    unsigned long long int count;
+    
     unsigned long long int total_count = 0;
 
     unsigned long long int threadsPerBlock = 1024;
@@ -243,8 +242,7 @@ int main(int argc, char* argv[])
         cudaEventDestroy(start);
         cudaEventDestroy(stop);
 
-        cudaMemcpy( counters, d_counters, sizeof(unsigned long long int) * (size+1), cudaMemcpyDeviceToHost);
-        
+          
         std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
         for (long j = 0; j < size+1; j++)
         {
@@ -256,7 +254,8 @@ int main(int argc, char* argv[])
 
     }
 
-    
+    cudaMemcpy( counters, d_counters, sizeof(unsigned long long int) * (size+1), cudaMemcpyDeviceToHost);
+      
     cudaFree(d_counters);
 
     for (long i = 0; i < size+1; i++)

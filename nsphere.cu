@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     std::cout << "size " << " " << size << " " << std::endl;
 
       
-    cudaMalloc(&d_count, sizeof(unsigned long long int));
+    
     for (int i = 0 ; i <= size ; i++){
       
       if (i != size )
@@ -233,7 +233,7 @@ int main(int argc, char* argv[])
 
       count=0 ;
 
-      
+      cudaMalloc(&d_count, sizeof(unsigned long long int));
       cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
       count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,i);
       cudaEventRecord(stop, 0);
