@@ -19,7 +19,7 @@
 #include <cuda.h>
 #include <ctime>
 
-#define MAX_THREAD_SIZE 4294967296// 65536 x 65536
+#define MAX_THREAD_SIZE 33554432// 65536 x 65536
 
 double diffclock(clock_t clock1,clock_t clock2)
 {
@@ -43,27 +43,27 @@ __global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsq
 {
   unsigned long long int n = MAX_THREAD_SIZE * index + blockDim.x * blockIdx.x + threadIdx.x;
 
-  if (n >= ntotal) return;
+  if (n < ntotal) {
 
-  long idx = 0;
-  double rtestsq = 0;
+    long idx = 0;
+    double rtestsq = 0;
 
-  while (n != 0) {
-    long rem = n % base;
-    n = n / base;
-    double xk = rem - halfb;
-    rtestsq += xk * xk;
-    ++idx;
+    while (n != 0) {
+      long rem = n % base;
+      n = n / base;
+      double xk = rem - halfb;
+      rtestsq += xk * xk;
+      ++idx;
+    }
+
+    for (long k = idx; k < ndim; ++k) {
+      double xk = 0.0 - halfb;
+      rtestsq += xk * xk;
+    }
+
+    if (rtestsq < rsquare) 
+      atomicAdd(count,1);
   }
-
-  for (long k = idx; k < ndim; ++k) {
-    double xk = 0.0 - halfb;
-    rtestsq += xk * xk;
-  }
-
-  if (rtestsq < rsquare) 
-    atomicAdd(count,1);
-
 }
 
 
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     int size =  (blocksPerGrid * threadsPerBlock )/ MAX_THREAD_SIZE;
-    unsigned long long int rest_blocksPerGrid = ( (blocksPerGrid * threadsPerBlock - size * MAX_THREAD_SIZE) + threadsPerBlock - 1) / threadsPerBlock ;
+    unsigned long long int rest_blocksPerGrid = ( (blocksPerGrid * threadsPerBlock ) % MAX_THREAD_SIZE  + threadsPerBlock - 1) / threadsPerBlock ;
 
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
     std::cout << "size " << " " << size << " " << std::endl;
@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
         cudaEventCreate(&start);
         cudaEventCreate(&stop);
         count=0 ;
-        
+
         cudaMalloc(&d_count, sizeof(unsigned long long int));
         cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
   
@@ -285,7 +285,8 @@ int main(int argc, char* argv[])
   
       }
     }
-   
+    std::cout << "---final result----" <<  std::endl;
+    std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
     //seq_count_in_v1_v2(nd, r);
     
 }
