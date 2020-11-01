@@ -200,9 +200,7 @@ int main(int argc, char* argv[])
     const double r = atof(argv[1]); 
     const long  nd = atol(argv[2]);
     
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
+    
 
     const long halfb = static_cast<long>(floor(r));
     const long base = 2 * halfb + 1;
@@ -223,7 +221,10 @@ int main(int argc, char* argv[])
     
 
     if (size == 0) {
-      
+      cudaEvent_t start, stop;
+      cudaEventCreate(&start);
+      cudaEventCreate(&stop);
+
       count=0 ;
       cudaMalloc(&d_count, sizeof(unsigned long long int));
       cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
@@ -256,7 +257,11 @@ int main(int argc, char* argv[])
         else
           blocksPerGrid = rest_blocksPerGrid;
 
+        cudaEvent_t start, stop;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
         count=0 ;
+        
         cudaMalloc(&d_count, sizeof(unsigned long long int));
         cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
   
@@ -272,6 +277,7 @@ int main(int argc, char* argv[])
         cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
         total_count += count;
         
+        std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
         std::cout << " GPU count -> " << i << " " << count << std::endl;
         std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
         std::cout << "Kernel took: " << time << " ms" << std::endl;
