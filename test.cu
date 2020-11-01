@@ -92,7 +92,8 @@ __global__ void cuda_func_count(int ndim, double radius, long nfrom, long nto, l
 	long index = 0;
 	long num = nfrom + id;
 	while (num < nto)
-	{
+	{	
+		/*
 		double rtestsq = 0;
 		
 		for (int i=0; i<ndim; i++)
@@ -101,12 +102,29 @@ __global__ void cuda_func_count(int ndim, double radius, long nfrom, long nto, l
 			num = num / base;
 			double xk = rem - halfb;
 			rtestsq += xk * xk;
-		}
+		}*/
 		
+		long idx = 0;
+		double rtestsq = 0;
+
+		while (n != 0) {
+			long rem = n % base;
+			n = n / base;
+			double xk = rem - halfb;
+			rtestsq += xk * xk;
+			++idx;
+		}
+
+		for (long k = idx; k < ndim; ++k) {
+			double xk = 0.0 - halfb;
+			rtestsq += xk * xk;
+		}
 		if (rtestsq < rsquare )
 		{
 			atomicAdd(&counter[id], 1);
 		}
+
+		
 		
 		index++;
 		num = nfrom + id + nthreads*index;	
