@@ -217,8 +217,8 @@ int main(int argc, char* argv[])
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
     std::cout << "size " << " " << size << " " << std::endl;
     
-    unsigned long long int* counters = new int[size+1];
-    memset(counters, 0, sizeof(unsigned long long int)*nthreads);
+    unsigned long long int* counters = new unsigned long long int[size+1];
+    memset(counters, 0, sizeof(unsigned long long int)*(size+1));
     unsigned long long int* d_counters;
     cudaMalloc(&d_counters, sizeof(unsigned long long int)*(size+1));
     
@@ -242,16 +242,21 @@ int main(int argc, char* argv[])
         cudaEventElapsedTime(&time, start, stop);
         cudaEventDestroy(start);
         cudaEventDestroy(stop);
-        
-        
-        total_count += count;
+
+        cudaMemcpy( counters, d_counters, sizeof(unsigned long long int) * (size+1), cudaMemcpyDeviceToHost);
         
         std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
+        for (long j = 0; j < size+1; j++)
+        {
+            std::cout << "GPU ->" << " " << counters[j] << " " << std::endl;
+        }
+        
         std::cout << "Kernel took: " << time << " ms" << std::endl;
         cudaFree(d_count);
 
     }
-    cudaMemcpy( counters, d_counters, sizeof(unsigned long long int) * (size+1), cudaMemcpyDeviceToHost);
+
+    
     cudaFree(d_counters);
 
     for (long i = 0; i < size+1; i++)
