@@ -39,9 +39,10 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count , int index)
+__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, 
+  long ndim , unsigned long long int* count ,  unsigned long long int start)
 {
-  long n = MAX_THREAD_SIZE * index + blockDim.x * blockIdx.x + threadIdx.x;
+  long n = start + blockDim.x * blockIdx.x + threadIdx.x;
 
   if (n < ntotal) {
 
@@ -205,6 +206,7 @@ int main(int argc, char* argv[])
     const long ntotal = powlong(base, nd);
     const double rsquare = r * r;
     std::cout << "### " << " Radius " << r << " Dimension " << nd << " Total Points " << ntotal << std::endl;
+
     unsigned long long int *d_count;
     unsigned long long int count;
     unsigned long long int total_count = 0;
@@ -216,10 +218,9 @@ int main(int argc, char* argv[])
 
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
     std::cout << "size " << " " << size << " " << std::endl;
-
       
     cudaMalloc(&d_count, sizeof(unsigned long long int));
-    
+
     for (int i = 0 ; i <= size ; i++){
       
       if (i != size )
@@ -231,12 +232,11 @@ int main(int argc, char* argv[])
       cudaEventCreate(&start);
       cudaEventCreate(&stop);
       cudaEventRecord(start, 0);
-
+      unsigned long long int start = MAX_THREAD_SIZE * i;
       count=0 ;
-
-      
       cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
-      count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,i);
+      count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,start);
+
       cudaEventRecord(stop, 0);
       cudaEventSynchronize(stop);
       float time;  // Must be a float
@@ -248,10 +248,9 @@ int main(int argc, char* argv[])
       total_count += count;
       
       std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
-      std::cout << " GPU count -> " << i << " " << count << std::endl;
+      std::cout << " GPU count -> " << start << " " << count << std::endl;
       std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
       std::cout << "Kernel took: " << time << " ms" << std::endl;
-      
 
     }
     cudaFree(d_count);
