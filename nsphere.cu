@@ -19,7 +19,7 @@
 #include <cuda.h>
 #include <ctime>
 
-#define MAX_THREAD_SIZE 1073741824// 65536 x 65536
+//#define MAX_THREAD_SIZE 1073741824// 65536 x 65536
 
 double diffclock(clock_t clock1,clock_t clock2)
 {
@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
     unsigned long long int *d_count;
     unsigned long long int count;
     unsigned long long int total_count = 0;
-
+    unsigned long long int MAX_THREAD_SIZE = 1073741824;
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
     int size =  (blocksPerGrid * threadsPerBlock )/ MAX_THREAD_SIZE;
@@ -222,7 +222,9 @@ int main(int argc, char* argv[])
     cudaMalloc(&d_count, sizeof(unsigned long long int));
 
     for (int i = 0 ; i <= size ; i++){
-      
+
+      unsigned long long int start_i = MAX_THREAD_SIZE * i;
+
       if (i != size )
         blocksPerGrid = MAX_THREAD_SIZE / threadsPerBlock;
       else
@@ -232,10 +234,10 @@ int main(int argc, char* argv[])
       cudaEventCreate(&start);
       cudaEventCreate(&stop);
       cudaEventRecord(start, 0);
-      unsigned long long int start = MAX_THREAD_SIZE * i;
+      
       count=0 ;
       cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
-      count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,start);
+      count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,start_i);
 
       cudaEventRecord(stop, 0);
       cudaEventSynchronize(stop);
@@ -248,7 +250,7 @@ int main(int argc, char* argv[])
       total_count += count;
       
       std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
-      std::cout << " GPU count -> " << start << " " << count << std::endl;
+      std::cout << " GPU count -> " << start_i << " " << count << std::endl;
       std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
       std::cout << "Kernel took: " << time << " ms" << std::endl;
 
