@@ -166,14 +166,10 @@ long count_in_gpu(long ndim, double radius)
 
 int main(int argc, char* argv[])
 {
-	// You can make this larger if you want
-
-  // Get a random value for the hypersphere radius between the two limits
-  const double r = aotf(argv[1]);
-
-  // Get a random value for the number of dimensions between 1 and MAXDIM inclusive
-  const long  nd = aotl(argv[2]);
-
+  
+  const double r = atof(argv[1]); 
+  const long  nd = atol(argv[2]);
+  
   clock_t tstart = clock();
   // const long seq_count = count_in_v1(nd, r);
   // double seq_t_cost = diffclock(clock(), tstart);
