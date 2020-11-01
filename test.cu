@@ -167,30 +167,26 @@ long count_in_gpu(long ndim, double radius)
 int main(int argc, char* argv[])
 {
 	// You can make this larger if you want
-	const long ntrials = 2;
-	for (long n = 0; n < ntrials; ++n) 
-	{
-		// Get a random value for the hypersphere radius between the two limits
-		const double r = drand48() * (RMAX - RMIN) + RMIN;
 
-		// Get a random value for the number of dimensions between 1 and MAXDIM inclusive
-		const long  nd = lrand48() % (MAXDIM - 1) + 1;
+  // Get a random value for the hypersphere radius between the two limits
+  const double r = aotf(argv[1]);
 
-		clock_t tstart = clock();
-		// const long seq_count = count_in_v1(nd, r);
-		// double seq_t_cost = diffclock(clock(), tstart);
-		// tstart = clock();
+  // Get a random value for the number of dimensions between 1 and MAXDIM inclusive
+  const long  nd = aotl(argv[2]);
 
-		/**********************************************/		
-		const long cuda_count = count_in_gpu(nd, r);
-		double cuda_t_cost = diffclock(clock(), tstart);
-		
-		cout <<"r:"<< r << "; nd:" << nd 
-		// << "; seq_count:" << seq_count << "; seq_t_cost:" << seq_t_cost 
-		<<"; cuda_count:"<< cuda_count << "; cuda_t_cost"<< cuda_t_cost <<endl;	
+  clock_t tstart = clock();
+  // const long seq_count = count_in_v1(nd, r);
+  // double seq_t_cost = diffclock(clock(), tstart);
+  // tstart = clock();
 
-		
-	}
+  /**********************************************/		
+  const long cuda_count = count_in_gpu(nd, r);
+  double cuda_t_cost = diffclock(clock(), tstart);
+  
+  cout <<"r:"<< r << "; nd:" << nd 
+  // << "; seq_count:" << seq_count << "; seq_t_cost:" << seq_t_cost 
+  <<"; cuda_count:"<< cuda_count << "; cuda_t_cost"<< cuda_t_cost <<endl;	
+
 	return 0;
 
 }
