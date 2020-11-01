@@ -208,10 +208,10 @@ int main(int argc, char* argv[])
     unsigned long long int *d_count;
     unsigned long long int count;
     unsigned long long int total_count = 0;
-    unsigned long long int MAX_THREAD_SIZE = 2147483648;// 1073741824;
+    unsigned long long int MAX_THREAD_SIZE = 2147483648;// 1073741824; 65536 x 65536
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
-    int size =  (blocksPerGrid * threadsPerBlock )/ MAX_THREAD_SIZE;
+    int patition_num =  (blocksPerGrid * threadsPerBlock )/ MAX_THREAD_SIZE;
     unsigned long long int rest_blocksPerGrid = ( (blocksPerGrid * threadsPerBlock ) % MAX_THREAD_SIZE  + threadsPerBlock - 1) / threadsPerBlock ;
 
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
@@ -219,11 +219,11 @@ int main(int argc, char* argv[])
       
     cudaMalloc(&d_count, sizeof(unsigned long long int));
 
-    for (int i = 0 ; i <= size ; i++){
+    for (int i = 0 ; i <= patition_num ; i++){
 
       unsigned long long int start_i = MAX_THREAD_SIZE * i;
 
-      if (i != size )
+      if (i != patition_num )
         blocksPerGrid = MAX_THREAD_SIZE / threadsPerBlock;
       else
         blocksPerGrid = rest_blocksPerGrid;
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
       total_count += count;
       
       std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
-      std::cout << " GPU total_count-> " << i << " " << total_count << std::endl;
+      std::cout << " GPU total_count " << i << " -> " << total_count << std::endl;
       std::cout << "Kernel took: " << time << " ms" << std::endl;
 
     }
