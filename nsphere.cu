@@ -19,6 +19,8 @@
 #include <cuda.h>
 #include <ctime>
 
+#define MAX_THREAD_SIZE 4294967296// 65536 x 65536
+
 double diffclock(clock_t clock1,clock_t clock2)
 {
   double diffticks = clock1 - clock2;
@@ -37,16 +39,15 @@ long powlong(long n, long k)
 /*----------------------------------------------------------------------------*/
 
 
-__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count )
+__global__ void count_in_v1_gpu (long ntotal , long base, long halfb, double rsquare, long ndim , unsigned long long int* count , int index)
 {
-  int n = blockDim.x * blockIdx.x + threadIdx.x;
+  unsigned long long int n = MAX_THREAD_SIZE * index + blockDim.x * blockIdx.x + threadIdx.x;
 
-  if (n >= ntotal)
-    return;
+  if (n >= ntotal) return;
 
   long idx = 0;
-
   double rtestsq = 0;
+
   while (n != 0) {
     long rem = n % base;
     n = n / base;
@@ -173,7 +174,8 @@ long count_in_v2(long ndim, double radius)
   return count;
 }
 
-void seq_count_in_v1_v2() 
+//Sequential version 
+void seq_count_in_v1_v2(long nd , double r) 
 {
   clock_t tstart = clock();
   const long num1 = count_in_v1(nd, r);
@@ -191,6 +193,7 @@ void seq_count_in_v1_v2()
   std::cout << "# Time elapsed: " << tms << " ms " << std::endl;
 }
 
+
 int main(int argc, char* argv[]) 
 {
 
@@ -205,35 +208,75 @@ int main(int argc, char* argv[])
     const long base = 2 * halfb + 1;
     const long ntotal = powlong(base, nd);
     const double rsquare = r * r;
-
+    std::cout << "### " << " Radius " << r << " Dimension " << nd << " Total Points " << ntotal << std::endl;
     unsigned long long int *d_count;
     unsigned long long int count;
-    count=0 ;
-
-    cudaMalloc(&d_count, sizeof(unsigned long long int));
-    cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
+    unsigned long long int total_count = 0;
 
     unsigned long long int threadsPerBlock = 1024;
     unsigned long long int blocksPerGrid = (ntotal + threadsPerBlock - 1) / threadsPerBlock ;
-    
-    std::cout << "### " << " Radius " << r << " Dimension " << nd << " Total Points " << ntotal << std::endl;
+    int size =  blocksPerGrid / MAX_THREAD_SIZE;
+    unsigned long long int rest_blocksPerGrid = ((blocksPerGrid - size * MAX_THREAD_SIZE) + threadsPerBlock - 1) / threadsPerBlock ;
+
     std::cout << "total threads " << " " << threadsPerBlock * blocksPerGrid<< " " << std::endl;
+
+    cudaMalloc(&d_count, sizeof(unsigned long long int));
+
+    if (size == 0) {
+      
+      count=0 ;
+      cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
+
+      cudaEventRecord(start, 0);
+      count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,0);
+      cudaEventRecord(stop, 0);
+      cudaEventSynchronize(stop);
+      float time;  // Must be a float
+      cudaEventElapsedTime(&time, start, stop);
+      cudaEventDestroy(start);
+      cudaEventDestroy(stop);
     
-    cudaEventRecord(start, 0);
-    count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count );
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
-    float time;  // Must be a float
-    cudaEventElapsedTime(&time, start, stop);
-    cudaEventDestroy(start);
-    cudaEventDestroy(stop);
+      cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
+      total_count += count;
+      
+      std::cout << " GPU count -> " << count << std::endl;
+      std::cout << "Kernel took: " << time << " ms" << std::endl;
+      std::cout << " GPU total_count-> " << total_count << std::endl;
+      cudaFree(d_count);
+    }
+
+    else {
+      
+      for (int i = 0 ; i <= size ; i++){
+        
+        if (i != size )
+          blocksPerGrid = MAX_THREAD_SIZE / threadsPerBlock;
+        else
+          blocksPerGrid = rest_blocksPerGrid;
+
+        count=0 ;
+        cudaMemcpy(d_count, &count, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
   
-    cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
-    std::cout << " GPU -> " << count << std::endl;
-    std::cout << "Kernel took: " << time << " ms" << std::endl;
-    cudaFree(d_count);
-    
-    //seq_count_in_v1_v2();
+        cudaEventRecord(start, 0);
+        count_in_v1_gpu<<<blocksPerGrid, threadsPerBlock>>>( ntotal, base, halfb, rsquare, nd, d_count ,i);
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        float time;  // Must be a float
+        cudaEventElapsedTime(&time, start, stop);
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
+      
+        cudaMemcpy( &count, d_count, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
+        total_count += count;
+        std::cout << " GPU count -> " << count << std::endl;
+        std::cout << "Kernel took: " << time << " ms" << std::endl;
+        std::cout << " GPU total_count-> " << total_count << std::endl;
+        cudaFree(d_count);
+  
+      }
+    }
+   
+    //seq_count_in_v1_v2(nd, r);
     
 }
 
